@@ -1,5 +1,4 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #include <spdlog/common.h>
 
@@ -49,5 +48,3 @@ class Log
     LOG_LOGGER_CALL(Airwave::Log::GetLoggerInstance(), spdlog::level::err, __VA_ARGS__)
 
 } // namespace Airwave
-
-#endif // !LOG_H

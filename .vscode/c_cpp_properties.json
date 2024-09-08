@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Develop/Tools/VulkanSDK/1.3.290.0/Include"
+            ]
+        }
+    ],
+    "version": 4
+}
