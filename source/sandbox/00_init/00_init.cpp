@@ -1,6 +1,11 @@
 #include <iostream>
 
+#include "utils/log.hpp"
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Airwave::Log::Init();
+
+    std::cout << "Hello, AirwaveEngine!" << std::endl;
+
     return 0;
 }

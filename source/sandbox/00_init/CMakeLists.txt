@@ -7,4 +7,4 @@ add_executable(00_init
     "00_init.cpp"
 )
 
-# target_link_libraries(00_init PRIVATE Engine)
+target_link_libraries(00_init PRIVATE engine)

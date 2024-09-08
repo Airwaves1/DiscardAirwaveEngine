@@ -49,6 +49,11 @@ message("++ Config directory: ${CMAKE_SOURCE_DIR}/install/config/")
 message("++ CMake directory: ${CMAKE_SOURCE_DIR}/install/cmake/")
 message("++ Scripts directory: ${CMAKE_SOURCE_DIR}/install/scripts/")
 
+#添加项目头文件搜索路径
+include_directories(${CMAKE_SOURCE_DIR}/source/engine/platform)
+include_directories(${CMAKE_SOURCE_DIR}/source/engine/core)
+
+
 # 添加第三方库头文件
 include_directories(${CMAKE_SOURCE_DIR}/external/glfw/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/glm)
@@ -61,6 +66,8 @@ include_directories(${CMAKE_SOURCE_DIR}/external/nlohmann_json)
 
 
 # 添加子目录
-add_subdirectory(source)
 add_subdirectory(external)
+add_subdirectory(source/engine)
+add_subdirectory(source/sandbox)
+
 

@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.8)
 
-add_library(external external.cpp)
+
+# 添加库
+add_library(external INTERFACE)
+
+target_compile_options(external INTERFACE -Wno-deprecated-declarations)
+
+add_compile_options(-Wno-deprecated-declarations)
 
 #glfw
 option(GLFW_BUILD_DOCS OFF)
@@ -26,9 +32,9 @@ add_subdirectory(stb_image)
 add_subdirectory(nlohmann_json)
 
 
-target_link_libraries(external PUBLIC glfw)
-target_link_libraries(external PUBLIC glad)
-target_link_libraries(external PUBLIC glm)
-target_link_libraries(external PUBLIC ImGui)
-target_link_libraries(external PUBLIC stb_image)
-target_link_libraries(external PUBLIC nlohmann_json)
+target_link_libraries(external INTERFACE  glfw)
+target_link_libraries(external INTERFACE  glad)
+target_link_libraries(external INTERFACE  glm)
+target_link_libraries(external INTERFACE  ImGui)
+target_link_libraries(external INTERFACE  stb_image)
+target_link_libraries(external INTERFACE  nlohmann_json)
