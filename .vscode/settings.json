@@ -78,5 +78,6 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "C:\\muyi\\Tools\\clang+llvm-18.1.8-x86_64-pc-windows-msvc\\clang+llvm-18.1.8-x86_64-pc-windows-msvc\\bin\\clang++.exe"
 }

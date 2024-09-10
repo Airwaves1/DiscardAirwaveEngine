@@ -4,6 +4,7 @@
 #include "utils/log.hpp"
 
 #include "window/aw_window.hpp"
+#include "graphics/graphic_contex.hpp"
 
 int main()
 {
@@ -17,6 +18,7 @@ int main()
     LOG_ERROR("Hello, AirwaveEngine");
 
     auto window = Airwave::AwWindow::Create(800, 600, "AirwaveEngine");
+    auto context = Airwave::GraphicContext::Create(window.get());
 
     while (!window->shouldClose())
     {

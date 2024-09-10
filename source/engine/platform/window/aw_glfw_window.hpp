@@ -20,6 +20,8 @@ class AwGLFWwindow : public AwWindow
 
     void swapBuffers() override;
 
+    GLFWwindow *getGLFWwindow() { return m_glfwWindow; }
+
   private:
     GLFWwindow *m_glfwWindow { nullptr };
 
