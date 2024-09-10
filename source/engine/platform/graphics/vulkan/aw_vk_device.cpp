@@ -16,6 +16,7 @@ const DeviceFeature requestedExtensions[] = {
 
 AwVkDevice::AwVkDevice(AwVkContext *context, uint32_t graphicQueueCount, uint32_t presentQueueCount,
                        const AwVkSettings &settings)
+    : m_settings(settings)
 {
     // 1.验证上下文
     if (!context)
@@ -59,7 +60,8 @@ AwVkDevice::AwVkDevice(AwVkContext *context, uint32_t graphicQueueCount, uint32_
                                       presentQueuePriorities.end());
     }
 
-    // 5. 创建队列创建信息,如果图形和呈现队列属于同一队列家族，则只创建一个队列创建信息，否则创建两个队列创建信息
+    // 5.
+    // 创建队列创建信息,如果图形和呈现队列属于同一队列家族，则只创建一个队列创建信息，否则创建两个队列创建信息
     VkDeviceQueueCreateInfo queueCreateInfo[2] = {
         {.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
          .pNext            = nullptr,
@@ -79,7 +81,8 @@ AwVkDevice::AwVkDevice(AwVkContext *context, uint32_t graphicQueueCount, uint32_
                               .pQueuePriorities = presentQueuePriorities.data()};
     }
 
-    // 6. 检查设备扩展,查询可用的设备扩展，并将其与请求的扩展进行比较。如果某些扩展不可用，函数将返回
+    // 6.
+    // 检查设备扩展,查询可用的设备扩展，并将其与请求的扩展进行比较。如果某些扩展不可用，函数将返回
     uint32_t availableExtensionCount = 0;
     CALL_VK(vkEnumerateDeviceExtensionProperties(context->getPhysicalDevice(), nullptr,
                                                  &availableExtensionCount, nullptr));
@@ -115,29 +118,35 @@ AwVkDevice::AwVkDevice(AwVkContext *context, uint32_t graphicQueueCount, uint32_
     LOG_TRACE("create device success");
 
     // 8.获取队列并存储
-    for(int i = 0; i < graphicQueueCount; i++)
+    for (int i = 0; i < graphicQueueCount; i++)
     {
         VkQueue queue;
         vkGetDeviceQueue(m_device, graphicQueueInfo.queueFamilyIndex, i, &queue);
-        m_graphicQueues.emplace_back(std::make_shared<AwVkQueue>(graphicQueueInfo.queueFamilyIndex, i, queue, false));
+        m_graphicQueues.emplace_back(
+            std::make_shared<AwVkQueue>(graphicQueueInfo.queueFamilyIndex, i, queue, false));
     }
-    
-    for(int i = 0; i < presentQueueCount; i++)
+
+    for (int i = 0; i < presentQueueCount; i++)
     {
         VkQueue queue;
         vkGetDeviceQueue(m_device, presentQueueInfo.queueFamilyIndex, i, &queue);
-        m_presentQueues.emplace_back(std::make_shared<AwVkQueue>(presentQueueInfo.queueFamilyIndex, i, queue, true));
+        m_presentQueues.emplace_back(
+            std::make_shared<AwVkQueue>(presentQueueInfo.queueFamilyIndex, i, queue, true));
     }
-    
+
     // 9.创建管线缓存
 
     // 10.创建命令池
 }
 
-AwVkDevice::~AwVkDevice() {
+AwVkDevice::~AwVkDevice()
+{
     vkDeviceWaitIdle(m_device);
-    vkDestroyDevice(m_device, nullptr);
-    LOG_TRACE("destroy device success");
+    if (m_device != VK_NULL_HANDLE)
+    {
+        vkDestroyDevice(m_device, nullptr);
+        LOG_TRACE("destroy device success");
+    }
 }
 
 } // namespace Airwave

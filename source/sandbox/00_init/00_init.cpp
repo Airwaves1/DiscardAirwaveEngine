@@ -7,7 +7,7 @@
 #include "graphics/graphic_contex.hpp"
 #include "graphics/vulkan/aw_vk_context.hpp"
 #include "graphics/vulkan/aw_vk_device.hpp"
-
+#include "graphics/vulkan/aw_vk_swapchain.hpp"
 int main()
 {
     Airwave::Log::Init();
@@ -20,8 +20,13 @@ int main()
     LOG_ERROR("Hello, AirwaveEngine");
 
     auto window = Airwave::AwWindow::Create(800, 600, "AirwaveEngine");
-    auto context = Airwave::GraphicContext::Create(window.get());
-    std::shared_ptr<Airwave::AwVkDevice> device = std::make_shared<Airwave::AwVkDevice>(dynamic_cast<Airwave::AwVkContext*>(context.get()), 1, 1);
+    auto graphicContext = Airwave::GraphicContext::Create(window.get());
+    auto vkContext = dynamic_cast<Airwave::AwVkContext *>(graphicContext.get());
+    auto vkDevice  = std::make_shared<Airwave::AwVkDevice>(vkContext, 1, 1);
+    auto vkSwapchain = std::make_shared<Airwave::AwVkSwapchain>(vkContext, vkDevice.get());
+    
+    vkSwapchain->recreate();
+
     while (!window->shouldClose())
     {
         window->pollEvents();
