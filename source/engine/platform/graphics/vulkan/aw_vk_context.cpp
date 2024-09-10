@@ -68,7 +68,7 @@ void AwVkContext::createInstance()
     CALL_VK(vkEnumerateInstanceLayerProperties(&availableLayerCount, availableLayers.data()));
 
     uint32_t enableLayerCount = 0;
-    const char *enableLayers[requestedLayers.size()];
+    const char *enableLayers[32];
     if (m_needValidationLayer)
     {
         if (!checkDeviceFeatures("Instance Layers", false, availableLayerCount,
@@ -96,7 +96,7 @@ void AwVkContext::createInstance()
                                                      glfwExtensions + glfwExtensionCount);
 
     uint32_t enableExtensionCount = 0;
-    const char *enableExtensions[requestedExtensions.size()];
+    const char *enableExtensions[32];
     if (!checkDeviceFeatures("Instance Extensions", true, availableExtensionCount,
                              availableExtensions.data(), requestedExtensions.size(),
                              requestedExtensions.data(), &enableExtensionCount, enableExtensions))
@@ -165,8 +165,8 @@ void AwVkContext::pickPhysicalDevice()
 {
     uint32_t phyDeviceCount;
     CALL_VK(vkEnumeratePhysicalDevices(m_instance, &phyDeviceCount, nullptr));
-    VkPhysicalDevice phyDevices[phyDeviceCount];
-    CALL_VK(vkEnumeratePhysicalDevices(m_instance, &phyDeviceCount, phyDevices));
+    std::vector<VkPhysicalDevice> phyDevices(phyDeviceCount);
+    CALL_VK(vkEnumeratePhysicalDevices(m_instance, &phyDeviceCount, phyDevices.data()));
 
     uint32_t maxScore              = 0;
     int32_t maxScorePhyDeviceIndex = -1;
@@ -183,9 +183,9 @@ void AwVkContext::pickPhysicalDevice()
         uint32_t formatCount;
         CALL_VK(
             vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount, nullptr));
-        VkSurfaceFormatKHR formats[formatCount];
+        std::vector<VkSurfaceFormatKHR> formats(formatCount);
         CALL_VK(
-            vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount, formats));
+            vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount, formats.data()));
         for (int j = 0; j < formatCount; j++)
         {
             if (formats[j].format == VK_FORMAT_B8G8R8A8_UNORM &&
@@ -199,8 +199,8 @@ void AwVkContext::pickPhysicalDevice()
         // query queue family
         uint32_t queueFamilyCount;
         vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount, nullptr);
-        VkQueueFamilyProperties queueFamilys[queueFamilyCount];
-        vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount, queueFamilys);
+        std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount, queueFamilys.data());
 
         LOG_DEBUG("score    --->    : {0}", score);
         LOG_DEBUG("queue family     : {0}", queueFamilyCount);

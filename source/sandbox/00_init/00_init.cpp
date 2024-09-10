@@ -5,6 +5,8 @@
 
 #include "window/aw_window.hpp"
 #include "graphics/graphic_contex.hpp"
+#include "graphics/vulkan/aw_vk_context.hpp"
+#include "graphics/vulkan/aw_vk_device.hpp"
 
 int main()
 {
@@ -19,7 +21,7 @@ int main()
 
     auto window = Airwave::AwWindow::Create(800, 600, "AirwaveEngine");
     auto context = Airwave::GraphicContext::Create(window.get());
-
+    std::shared_ptr<Airwave::AwVkDevice> device = std::make_shared<Airwave::AwVkDevice>(dynamic_cast<Airwave::AwVkContext*>(context.get()), 1, 1);
     while (!window->shouldClose())
     {
         window->pollEvents();

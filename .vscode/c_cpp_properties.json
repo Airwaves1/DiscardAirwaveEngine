@@ -4,10 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                // "C:/Develop/Tools/VulkanSDK/1.3.290.0/Include"
-                "C:/VulkanSDK/1.3.290.0/Include"
+                "C:/Develop/Tools/VulkanSDK/1.3.290.0/Include"
             ],
-            "compilerPath": "C:/muyi/Tools/clang+llvm-18.1.8-x86_64-pc-windows-msvc/clang+llvm-18.1.8-x86_64-pc-windows-msvc/bin/clang++.exe",
             "intelliSenseMode": "${default}"
         }
     ],
