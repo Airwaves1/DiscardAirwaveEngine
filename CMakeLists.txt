@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Os -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Os -Wall")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # 设置可执行文件的输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -40,10 +42,15 @@ endif()
 
 # 添加宏定义
 add_definitions(-DPROJECT_ROOT="${CMAKE_SOURCE_DIR}")
+set(PROJECT_ROOT "${CMAKE_SOURCE_DIR}")
 add_definitions(-DASSETS_DIR="${CMAKE_SOURCE_DIR}/install/assets/")
+set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/install/assets/")
 add_definitions(-DCONFIG_DIR="${CMAKE_SOURCE_DIR}/install/config/")
+set(CONFIG_DIR "${CMAKE_SOURCE_DIR}/install/config/")
 add_definitions(-DCMAKE_DIR="${CMAKE_SOURCE_DIR}/install/cmake/")
+set(CMAKE_DIR "${CMAKE_SOURCE_DIR}/install/cmake/")
 add_definitions(-DSCRIPTS_DIR="${CMAKE_SOURCE_DIR}/install/scripts/")
+set(SCRIPTS_DIR "${CMAKE_SOURCE_DIR}/install/scripts/")
 
 message("++ Project root: ${CMAKE_SOURCE_DIR}")
 message("++ Assets directory: ${CMAKE_SOURCE_DIR}/install/assets/")
@@ -52,6 +59,7 @@ message("++ CMake directory: ${CMAKE_SOURCE_DIR}/install/cmake/")
 message("++ Scripts directory: ${CMAKE_SOURCE_DIR}/install/scripts/")
 
 # 添加项目头文件搜索路径
+include_directories(${CMAKE_SOURCE_DIR}/source/engine)
 include_directories(${CMAKE_SOURCE_DIR}/source/engine/platform)
 include_directories(${CMAKE_SOURCE_DIR}/source/engine/core)
 
@@ -64,7 +72,6 @@ include_directories(${CMAKE_SOURCE_DIR}/external/glad/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/imgui)
 include_directories(${CMAKE_SOURCE_DIR}/external/imgui/backends)
 include_directories(${CMAKE_SOURCE_DIR}/external/nlohmann_json)
-
 
 # 添加子目录
 add_subdirectory(external)

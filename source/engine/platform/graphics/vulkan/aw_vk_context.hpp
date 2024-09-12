@@ -19,6 +19,7 @@ class AwVkContext : public GraphicContext
     AwVkContext(AwWindow *window);
     ~AwVkContext() override;
 
+    void swapBuffers() override {}
     VkInstance getInstance() const { return m_instance; }
     VkSurfaceKHR getSurface() const { return m_surface; }
     VkPhysicalDevice getPhysicalDevice() const { return m_phyDevice; }
@@ -39,8 +40,8 @@ class AwVkContext : public GraphicContext
 
   private:
     bool m_needValidationLayer = true;
-    VkInstance m_instance = VK_NULL_HANDLE;
-    VkSurfaceKHR m_surface = VK_NULL_HANDLE; 
+    VkInstance m_instance      = VK_NULL_HANDLE;
+    VkSurfaceKHR m_surface     = VK_NULL_HANDLE;
 
     VkPhysicalDevice m_phyDevice = VK_NULL_HANDLE;
     QueueFamilyInfo m_graphicQueueFamily;

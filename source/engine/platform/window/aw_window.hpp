@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
+#include "graphics/graphic_contex.hpp"
 
 namespace Airwave
 {
@@ -19,6 +20,14 @@ class AwWindow
     virtual void pollEvents()  = 0;
     virtual void swapBuffers() = 0;
 
+    virtual void *getNativeWindow() = 0;
+
+    std::shared_ptr<GraphicContext> getGraphicContext() { return m_graphicContext; }
+
+    uint32_t getWidth() const { return m_width; }
+    uint32_t getHeight() const { return m_height; }
+    std::string getTitle() const { return m_title; }
+
   protected:
     AwWindow() = default;
 
@@ -26,6 +35,8 @@ class AwWindow
     uint32_t m_height{720};
 
     std::string m_title{"AirwaveEngine"};
+
+    std::shared_ptr<GraphicContext> m_graphicContext;
 };
 
 } // namespace Airwave

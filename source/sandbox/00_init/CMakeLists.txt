@@ -1,10 +1,10 @@
 cmake_minimum_required (VERSION 3.8)
 
-project(00_init)
+project(00_triangle)
 
 
-add_executable(00_init 
-    "00_init.cpp"
+add_executable(00_triangle 
+    "00_triangle.cpp"
 )
 
-target_link_libraries(00_init PRIVATE engine)
+target_link_libraries(00_triangle PRIVATE engine)

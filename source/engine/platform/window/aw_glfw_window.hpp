@@ -1,12 +1,12 @@
 #pragma once
 
 #include "aw_window.hpp"
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
 
-
+class GLFWwindow;
 namespace Airwave
 {
+
+
 class AwGLFWwindow : public AwWindow
 {
   public:
@@ -20,11 +20,9 @@ class AwGLFWwindow : public AwWindow
 
     void swapBuffers() override;
 
-    GLFWwindow *getGLFWwindow() { return m_glfwWindow; }
+    void *getNativeWindow() override { return m_glfwWindow; }
 
   private:
-    GLFWwindow *m_glfwWindow { nullptr };
-
-
+    GLFWwindow *m_glfwWindow{nullptr};
 };
 } // namespace Airwave

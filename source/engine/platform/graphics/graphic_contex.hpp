@@ -18,6 +18,8 @@ class GraphicContext
 
     static std::unique_ptr<GraphicContext> Create(AwWindow *window);
 
+    virtual void swapBuffers() = 0;
+
   protected:
     GraphicContext() = default;
 };

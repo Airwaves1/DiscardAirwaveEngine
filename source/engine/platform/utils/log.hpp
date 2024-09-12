@@ -24,7 +24,7 @@ class Log
     }
 
   private:
-    Log() = default;
+    Log()  = default;
     ~Log() = default;
 
     void Logger(spdlog::source_loc loc, spdlog::level::level_enum lvl,
@@ -45,6 +45,12 @@ class Log
 #define LOG_WARN(...)                                                                              \
     LOG_LOGGER_CALL(Airwave::Log::GetLoggerInstance(), spdlog::level::warn, __VA_ARGS__)
 #define LOG_ERROR(...)                                                                             \
-    LOG_LOGGER_CALL(Airwave::Log::GetLoggerInstance(), spdlog::level::err, __VA_ARGS__)
+    LOG_LOGGER_CALL(Airwave::Log::GetLoggerInstance(), spdlog::level::err, ##__VA_ARGS__)
 
+#define AW_ASSERT(x, ...)                                                                     \
+    if (!x)                                                                                        \
+    {                                                                                              \
+        LOG_ERROR("Assertion Failed: {0}", __VA_ARGS__);                                           \
+        __debugbreak();                                                                            \
+    }
 } // namespace Airwave

@@ -1,5 +1,7 @@
 #include "aw_vk_context.hpp"
 
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include "window/aw_glfw_window.hpp"
@@ -156,7 +158,9 @@ void AwVkContext::createSurface(AwWindow *window)
         return;
     }
 
-    CALL_VK(glfwCreateWindowSurface(m_instance, glfwWindow->getGLFWwindow(), nullptr, &m_surface));
+    auto glfwWindowHandle = static_cast<GLFWwindow *>(glfwWindow->getNativeWindow());
+
+    CALL_VK(glfwCreateWindowSurface(m_instance, glfwWindowHandle, nullptr, &m_surface));
 
     LOG_INFO("Vulkan surface created");
 }
@@ -184,8 +188,8 @@ void AwVkContext::pickPhysicalDevice()
         CALL_VK(
             vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount, nullptr));
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
-        CALL_VK(
-            vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount, formats.data()));
+        CALL_VK(vkGetPhysicalDeviceSurfaceFormatsKHR(phyDevices[i], m_surface, &formatCount,
+                                                     formats.data()));
         for (int j = 0; j < formatCount; j++)
         {
             if (formats[j].format == VK_FORMAT_B8G8R8A8_UNORM &&
@@ -200,7 +204,8 @@ void AwVkContext::pickPhysicalDevice()
         uint32_t queueFamilyCount;
         vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount, nullptr);
         std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount, queueFamilys.data());
+        vkGetPhysicalDeviceQueueFamilyProperties(phyDevices[i], &queueFamilyCount,
+                                                 queueFamilys.data());
 
         LOG_DEBUG("score    --->    : {0}", score);
         LOG_DEBUG("queue family     : {0}", queueFamilyCount);
@@ -256,11 +261,12 @@ void AwVkContext::pickPhysicalDevice()
 
     m_phyDevice = phyDevices[maxScorePhyDeviceIndex];
     vkGetPhysicalDeviceMemoryProperties(m_phyDevice, &m_phyDeviceMemoryProperties);
-    LOG_TRACE("{0} : physical device:{1}, score:{2}, graphic queue: {3} : {4}, present queue: {5} : "
-          "{6}",
-          __FUNCTION__, maxScorePhyDeviceIndex, maxScore, m_graphicQueueFamily.queueFamilyIndex,
-          m_graphicQueueFamily.queueCount, m_presentQueueFamily.queueFamilyIndex,
-          m_presentQueueFamily.queueCount);
+    LOG_TRACE("{0} : physical device:{1}, score:{2}, graphic queue: {3} : {4}, present queue: {5} "
+              ": "
+              "{6}",
+              __FUNCTION__, maxScorePhyDeviceIndex, maxScore, m_graphicQueueFamily.queueFamilyIndex,
+              m_graphicQueueFamily.queueCount, m_presentQueueFamily.queueFamilyIndex,
+              m_presentQueueFamily.queueCount);
 }
 
 void AwVkContext::printPhysicalDeviceProperties(VkPhysicalDeviceProperties &props)
