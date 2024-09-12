@@ -25,26 +25,26 @@ namespace Airwave
     public:
         // 把相关代码抽象成以下三个接口，放在RenderAPI类里, 这些都是抽象接口, 具体会通过创建一个与平台相关的子类的
         // RendererAPI的静态对象, 比如OpenGLRenderer, 然后把RenderCommand作为一个Wrapper, 将其接口暴露出来
-        virtual void Init() const = 0;
+        virtual void init() const = 0;
 
-        virtual void Clear(RenderClearFlag flag = RenderClearFlag::Color | RenderClearFlag::Depth | RenderClearFlag::Stencil) const = 0;
-        virtual void SetClearColor(const glm::vec4 &) = 0;
+        virtual void clear(RenderClearFlag flag = RenderClearFlag::Color | RenderClearFlag::Depth | RenderClearFlag::Stencil) const = 0;
+        virtual void setClearColor(const glm::vec4 &) = 0;
 
-        virtual void Enable(RenderState state)  = 0;
-        virtual void Disable(RenderState state)  = 0;
+        virtual void enable(RenderState state)  = 0;
+        virtual void disable(RenderState state)  = 0;
 
-        virtual void OnViewportResize(uint32_t width, uint32_t height) const = 0;
-        virtual void DrawIndexed(const std::shared_ptr<VertexArray> &, uint32_t count) const = 0; // count为0则绘制整个IndexBuffer
+        virtual void onViewportResize(uint32_t width, uint32_t height) const = 0;
+        virtual void drawIndexed(const std::shared_ptr<VertexArray> &, uint32_t count) const = 0; // count为0则绘制整个IndexBuffer
 
-        inline static APIType GetAPIType() { return s_CurType; }
-        inline static void SetAPIType(APIType type) { s_CurType = type; }
+        inline static APIType GetAPIType() { return s_curType; }
+        inline static void SetAPIType(APIType type) { s_curType = type; }
 
     protected:
-        static APIType s_CurType;
+        static APIType s_curType;
 
-        RenderState m_CurRenderState;
-        RenderClearFlag m_CurClearFlag;
-        glm::vec4 m_ClearColor;
+        RenderState m_curRenderState;
+        RenderClearFlag m_curClearFlag;
+        glm::vec4 m_clearColor;
     };
 
 } // namespace Airwave

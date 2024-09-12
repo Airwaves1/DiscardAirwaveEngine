@@ -9,18 +9,18 @@ namespace Airwave
     class OpenGLRendererAPI : public RendererAPI
     {
     public:
-        virtual void Init() const override;
+        virtual void init() const override;
 
-        virtual void Clear(RenderClearFlag flag = RenderClearFlag::Color | RenderClearFlag::Depth | RenderClearFlag::Stencil) const override;
+        virtual void clear(RenderClearFlag flag = RenderClearFlag::Color | RenderClearFlag::Depth | RenderClearFlag::Stencil) const override;
 
-        virtual void SetClearColor(const glm::vec4 &color) override;
+        virtual void setClearColor(const glm::vec4 &color) override;
 
-        virtual void Enable(RenderState state) override;
-        virtual void Disable(RenderState state) override;
+        virtual void enable(RenderState state) override;
+        virtual void disable(RenderState state) override;
 
-        virtual void OnViewportResize(uint32_t width, uint32_t height) const override;
+        virtual void onViewportResize(uint32_t width, uint32_t height) const override;
 
-        virtual void DrawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count = 0) const override;
+        virtual void drawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count = 0) const override;
 
     private:
         GLenum RenderStateToGLenum(RenderState state);

@@ -84,19 +84,19 @@ std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t *data, uint32_t size)
     return buffer;
 }
 
-void BufferLayout::CalculateElementsOffsets()
+void BufferLayout::calculateElementsOffsets()
 {
-    m_Stride = 0;
-    for (auto &element : m_Elements)
+    m_stride = 0;
+    for (auto &element : m_elements)
     {
-        element.SetOffset(m_Stride);
-        m_Stride += element.GetSize();
+        element.SetOffset(m_stride);
+        m_stride += element.getSize();
     }
 }
 
-bool BufferElement::IsIntergerType() const
+bool BufferElement::isIntergerType() const
 {
-    if (m_Type == ShaderDataType::INT) return true;
+    if (m_type == ShaderDataType::INT) return true;
     return false;
 }
 

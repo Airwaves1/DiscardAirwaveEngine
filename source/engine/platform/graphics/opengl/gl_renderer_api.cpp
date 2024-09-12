@@ -6,7 +6,7 @@
 
 namespace Airwave
 {
-    void OpenGLRendererAPI::Init() const
+    void OpenGLRendererAPI::init() const
     {
         glEnable(GL_BLEND);
         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -16,7 +16,7 @@ namespace Airwave
         glEnable(GL_MULTISAMPLE);
     }
 
-    void OpenGLRendererAPI::Clear(RenderClearFlag flag) const
+    void OpenGLRendererAPI::clear(RenderClearFlag flag) const
     {
         uint32_t clearFlag = 0;
         if ((flag & RenderClearFlag::Color) == RenderClearFlag::Color)
@@ -29,19 +29,19 @@ namespace Airwave
         glClear(clearFlag);
     }
 
-    void OpenGLRendererAPI::SetClearColor(const glm::vec4 &color)
+    void OpenGLRendererAPI::setClearColor(const glm::vec4 &color)
     {
-        if (m_ClearColor != color)
+        if (m_clearColor != color)
         {
-            m_ClearColor = color;
-            glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
+            m_clearColor = color;
+            glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
         }
     }
 
-    void OpenGLRendererAPI::Enable(RenderState state)
+    void OpenGLRendererAPI::enable(RenderState state)
     {
         // 计算要启用的状态位
-        RenderState statesToEnable = state ^ m_CurRenderState;
+        RenderState statesToEnable = state ^ m_curRenderState;
 
         // 更新状态
         for (int i = 0; i < 8; i++)
@@ -53,10 +53,10 @@ namespace Airwave
         }
     }
 
-    void OpenGLRendererAPI::Disable(RenderState state)
+    void OpenGLRendererAPI::disable(RenderState state)
     {
         // 计算要禁用的状态位
-        RenderState statesToDisable = m_CurRenderState ^ state;
+        RenderState statesToDisable = m_curRenderState ^ state;
 
         // 更新状态
         for (int i = 0; i < 8; i++)
@@ -68,18 +68,18 @@ namespace Airwave
         }
     }
 
-    void OpenGLRendererAPI::OnViewportResize(uint32_t width, uint32_t height) const
+    void OpenGLRendererAPI::onViewportResize(uint32_t width, uint32_t height) const
     {
         glViewport(0, 0, width, height);
     }
 
-    void OpenGLRendererAPI::DrawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count) const
+    void OpenGLRendererAPI::drawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count) const
     {
 
         if (count == 0)
         {
-            glDrawElements(GL_TRIANGLES, va->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-            LOG_DEBUG("va->GetIndexBuffer()->GetCount() : {0}", va->GetIndexBuffer()->GetCount());
+            glDrawElements(GL_TRIANGLES, va->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+            LOG_DEBUG("va->GetIndexBuffer()->GetCount() : {0}", va->getIndexBuffer()->getCount());
         }
         else
         {

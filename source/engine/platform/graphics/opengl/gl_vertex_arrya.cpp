@@ -40,74 +40,74 @@ namespace Airwave
 
     OpenGLVertexArray::OpenGLVertexArray()
     {
-        glGenVertexArrays(1, &m_Index);
+        glGenVertexArrays(1, &m_index);
     }
 
     OpenGLVertexArray::~OpenGLVertexArray()
     {
-        glDeleteVertexArrays(1, &m_Index);
+        glDeleteVertexArrays(1, &m_index);
     }
 
-    void OpenGLVertexArray::Bind() const
+    void OpenGLVertexArray::bind() const
     {
-        glBindVertexArray(m_Index);
+        glBindVertexArray(m_index);
     }
 
-    void OpenGLVertexArray::Unbind() const
+    void OpenGLVertexArray::unbind() const
     {
         glBindVertexArray(0);
     }
 
-    void OpenGLVertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer> &vertexBuffer)
+    void OpenGLVertexArray::addVertexBuffer(const std::shared_ptr<VertexBuffer> &vertexBuffer)
     {
-        AW_ASSERT(vertexBuffer->GetBufferLayout().GetCount(), "Empty Layout in VertexBuffer!");
+        AW_ASSERT(vertexBuffer->getBufferLayout().getCount(), "Empty Layout in VertexBuffer!");
 
-        glBindVertexArray(m_Index);
-        vertexBuffer->Bind();
+        glBindVertexArray(m_index);
+        vertexBuffer->bind();
 
-        BufferLayout layout = vertexBuffer->GetBufferLayout();
+        BufferLayout layout = vertexBuffer->getBufferLayout();
         int index = 0;
         for (const BufferElement &element : layout)
         {
             glEnableVertexAttribArray(index);
-            if (element.IsIntergerType())
+            if (element.isIntergerType())
             {
                 glVertexAttribIPointer(index,
-                                       GetShaderTypeDataCount(element.GetType()),
-                                       GetShaderDataTypeToOpenGL(element.GetType()),
-                                       layout.GetStride(),
-                                       (const void *)(uint64_t)(element.GetOffset()));
+                                       GetShaderTypeDataCount(element.getType()),
+                                       GetShaderDataTypeToOpenGL(element.getType()),
+                                       layout.getStride(),
+                                       (const void *)(uint64_t)(element.getOffset()));
             }
             else
             {
                 glVertexAttribPointer(index,
-                                      GetShaderTypeDataCount(element.GetType()),
-                                      GetShaderDataTypeToOpenGL(element.GetType()),
-                                      element.IsNormalized() ? GL_TRUE : GL_FALSE,
-                                      layout.GetStride(),
-                                      (const void *)(uint64_t)(element.GetOffset()));
+                                      GetShaderTypeDataCount(element.getType()),
+                                      GetShaderDataTypeToOpenGL(element.getType()),
+                                      element.isNormalized() ? GL_TRUE : GL_FALSE,
+                                      layout.getStride(),
+                                      (const void *)(uint64_t)(element.getOffset()));
                                 
             }
             index++;
         }
-        m_VertexBuffers.push_back(vertexBuffer);
+        m_vertexBuffers.push_back(vertexBuffer);
     }
 
-    void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer> &indexBuffer)
+    void OpenGLVertexArray::setIndexBuffer(const std::shared_ptr<IndexBuffer> &indexBuffer)
     {
-        glBindVertexArray(m_Index);
-        indexBuffer->Bind();
-        m_IndexBuffer = indexBuffer;
+        glBindVertexArray(m_index);
+        indexBuffer->bind();
+        m_indexBuffer = indexBuffer;
     }
 
-    const std::vector<std::shared_ptr<VertexBuffer>> &OpenGLVertexArray::GetVertexBuffers() const
+    const std::vector<std::shared_ptr<VertexBuffer>> &OpenGLVertexArray::getVertexBuffers() const
     {
-        return m_VertexBuffers;
+        return m_vertexBuffers;
     }
 
-    const std::shared_ptr<IndexBuffer> &OpenGLVertexArray::GetIndexBuffer() const
+    const std::shared_ptr<IndexBuffer> &OpenGLVertexArray::getIndexBuffer() const
     {
-        return m_IndexBuffer;
+        return m_indexBuffer;
     }
 
 } // namespace Airwave

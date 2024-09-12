@@ -70,8 +70,8 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
         fragmentSrc = fragment;
     }
 
-    m_OpenGLSourceCode[ShaderType::Vertex]   = vertexSrc;
-    m_OpenGLSourceCode[ShaderType::Fragment] = fragmentSrc;
+    m_openGLSourceCode[ShaderType::Vertex]   = vertexSrc;
+    m_openGLSourceCode[ShaderType::Fragment] = fragmentSrc;
 
     GLuint vertexShader  = glCreateShader(GL_VERTEX_SHADER);
     const GLchar *source = (const char *)vertexSrc.c_str();
@@ -116,24 +116,24 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
         return;
     }
 
-    m_RendererID = glCreateProgram();
+    m_rendererID = glCreateProgram();
 
-    glAttachShader(m_RendererID, vertexShader);
-    glAttachShader(m_RendererID, fragmentShader);
+    glAttachShader(m_rendererID, vertexShader);
+    glAttachShader(m_rendererID, fragmentShader);
 
-    glLinkProgram(m_RendererID);
+    glLinkProgram(m_rendererID);
 
     GLint isLinked = 0;
-    glGetProgramiv(m_RendererID, GL_LINK_STATUS, (int *)&isLinked);
+    glGetProgramiv(m_rendererID, GL_LINK_STATUS, (int *)&isLinked);
     if (isLinked == GL_FALSE)
     {
         GLint maxLength = 0;
-        glGetProgramiv(m_RendererID, GL_INFO_LOG_LENGTH, &maxLength);
+        glGetProgramiv(m_rendererID, GL_INFO_LOG_LENGTH, &maxLength);
 
         std::vector<GLchar> infoLog(maxLength);
-        glGetProgramInfoLog(m_RendererID, maxLength, &maxLength, &infoLog[0]);
+        glGetProgramInfoLog(m_rendererID, maxLength, &maxLength, &infoLog[0]);
 
-        glDeleteProgram(m_RendererID);
+        glDeleteProgram(m_rendererID);
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
@@ -143,35 +143,35 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
         return;
     }
 
-    glDetachShader(m_RendererID, vertexShader);
-    glDetachShader(m_RendererID, fragmentShader);
+    glDetachShader(m_rendererID, vertexShader);
+    glDetachShader(m_rendererID, fragmentShader);
 }
 
-OpenGLShader::~OpenGLShader() { glDeleteProgram(m_RendererID); }
+OpenGLShader::~OpenGLShader() { glDeleteProgram(m_rendererID); }
 
-void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
+void OpenGLShader::bind() const { glUseProgram(m_rendererID); }
 
-void OpenGLShader::Unbind() const { glUseProgram(0); }
+void OpenGLShader::unbind() const { glUseProgram(0); }
 
-void OpenGLShader::CompileOrGetVulkanBinaries(
+void OpenGLShader::compileOrGetVulkanBinaries(
     const std::unordered_map<ShaderType, std::string> &shaderSources)
 {
     // TODO: Compile the shader source code
 }
 
-void OpenGLShader::CompileOrGetOpenGLBinaries() {}
+void OpenGLShader::compileOrGetOpenGLBinaries() {}
 
-void OpenGLShader::Reflect(ShaderType stage, const std::vector<uint32_t> &shaderData) {}
+void OpenGLShader::reflect(ShaderType stage, const std::vector<uint32_t> &shaderData) {}
 
-void OpenGLShader::UploadUniformInt(const std::string &name, int value)
+void OpenGLShader::uploadUniformInt(const std::string &name, int value)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
@@ -179,90 +179,90 @@ void OpenGLShader::UploadUniformInt(const std::string &name, int value)
     glUniform1i(location, value);
 }
 
-void OpenGLShader::UploadUniformFloat(const std::string &name, float value)
+void OpenGLShader::uploadUniformFloat(const std::string &name, float value)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
     glUniform1f(location, value);
 }
 
-void OpenGLShader::UploadUniformFloat2(const std::string &name, const glm::vec2 &vector2)
+void OpenGLShader::uploadUniformFloat2(const std::string &name, const glm::vec2 &vector2)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
     glUniform2f(location, vector2.x, vector2.y);
 }
 
-void OpenGLShader::UploadUniformFloat3(const std::string &name, const glm::vec3 &vector3)
+void OpenGLShader::uploadUniformFloat3(const std::string &name, const glm::vec3 &vector3)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
     glUniform3f(location, vector3.x, vector3.y, vector3.z);
 }
 
-void OpenGLShader::UploadUniformFloat4(const std::string &name, const glm::vec4 &vector4)
+void OpenGLShader::uploadUniformFloat4(const std::string &name, const glm::vec4 &vector4)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
     glUniform4f(location, vector4.x, vector4.y, vector4.z, vector4.w);
 }
 
-void OpenGLShader::UploadUniformMat3(const std::string &name, const glm::mat3 &matrix)
+void OpenGLShader::uploadUniformMat3(const std::string &name, const glm::mat3 &matrix)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void OpenGLShader::UploadUniformMat4(const std::string &name, const glm::mat4 &matrix)
+void OpenGLShader::uploadUniformMat4(const std::string &name, const glm::mat4 &matrix)
 {
-    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_rendererID, name.c_str());
     if (location == -1)
     {
-        if (m_UniformErrordCache.find(name) == m_UniformErrordCache.end())
+        if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
             LOG_ERROR("Uniform {0} not found!", name);
-            m_UniformErrordCache[name] = true;
+            m_uniformErrordCache[name] = true;
         }
         return;
     }

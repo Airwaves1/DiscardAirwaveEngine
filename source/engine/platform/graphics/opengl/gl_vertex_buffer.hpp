@@ -15,17 +15,17 @@ namespace Airwave
         OpenGLVertexBuffer(uint32_t size);                  // dynamic buffer
         virtual ~OpenGLVertexBuffer() override;
 
-        virtual void Bind() const override;
-        virtual void Unbind() const override;
+        virtual void bind() const override;
+        virtual void unbind() const override;
 
-        virtual void SetData(uint32_t pos, void *data, uint32_t len) override;
+        virtual void setData(uint32_t pos, void *data, uint32_t len) override;
 
-        virtual BufferLayout &GetBufferLayout() override { return m_Layout; }
-        virtual void SetBufferLayout(const BufferLayout &layout) override { m_Layout = layout; }
+        virtual BufferLayout &getBufferLayout() override { return m_layout; }
+        virtual void setBufferLayout(const BufferLayout &layout) override { m_layout = layout; }
 
     private:
-        uint32_t m_VertexBuffer;
-        BufferLayout m_Layout;
+        uint32_t m_vertexBuffer;
+        BufferLayout m_layout;
     };
 
 	class OpenGLIndexBuffer : public IndexBuffer
@@ -34,14 +34,14 @@ namespace Airwave
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t size);	// Static
 		virtual ~OpenGLIndexBuffer() override;
 
-		uint32_t GetCount() const override;
+		uint32_t getCount() const override;
 
-		void Bind()const override;
-		void Unbind() const override;
+		void bind()const override;
+		void unbind() const override;
 
 	private:
-		uint32_t m_Count;
-		uint32_t m_IndexBuffer;
+		uint32_t m_count;
+		uint32_t m_indexBuffer;
 	};
 
 } // namespace Airwave

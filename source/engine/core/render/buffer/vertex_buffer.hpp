@@ -93,51 +93,51 @@ class BufferElement
 {
   public:
     BufferElement(const ShaderDataType &type, const std::string &name, bool isNormalized = false)
-        : m_Type(type), m_Name(name), m_Size(GetShaderDataTypeSize(type)), m_Offset(0),
-          m_IsNormalized(isNormalized)
+        : m_type(type), m_name(name), m_size(GetShaderDataTypeSize(type)), m_offset(0),
+          m_isNormalized(isNormalized)
     {
     }
 
-    void SetOffset(uint32_t offset) { m_Offset = offset; }
+    void SetOffset(uint32_t offset) { m_offset = offset; }
 
-    uint32_t GetSize() const { return m_Size; }
-    uint32_t GetOffset() const { return m_Offset; }
-    ShaderDataType GetType() const { return m_Type; }
-    bool IsIntergerType() const;
-    bool IsNormalized() const { return m_IsNormalized; }
+    uint32_t getSize() const { return m_size; }
+    uint32_t getOffset() const { return m_offset; }
+    ShaderDataType getType() const { return m_type; }
+    bool isIntergerType() const;
+    bool isNormalized() const { return m_isNormalized; }
 
   private:
-    std::string m_Name;
-    ShaderDataType m_Type;
-    uint32_t m_Size;
-    uint32_t m_Offset;
-    bool m_IsNormalized;
+    std::string m_name;
+    ShaderDataType m_type;
+    uint32_t m_size;
+    uint32_t m_offset;
+    bool m_isNormalized;
 };
 
 class BufferLayout
 {
   public:
     BufferLayout() {}
-    BufferLayout(const std::initializer_list<BufferElement> &list) : m_Elements(list)
+    BufferLayout(const std::initializer_list<BufferElement> &list) : m_elements(list)
     {
-        CalculateElementsOffsets();
+        calculateElementsOffsets();
     }
 
-    uint32_t GetStride() const { return m_Stride; }
-    size_t GetCount() const { return m_Elements.size(); }
+    uint32_t getStride() const { return m_stride; }
+    size_t getCount() const { return m_elements.size(); }
 
-    std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
-    std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
-
-  private:
-    std::vector<BufferElement> m_Elements;
-    uint32_t m_Stride;
+    std::vector<BufferElement>::iterator begin() { return m_elements.begin(); }
+    std::vector<BufferElement>::iterator end() { return m_elements.end(); }
 
   private:
-    void CalculateElementsOffsets();
+    std::vector<BufferElement> m_elements;
+    uint32_t m_stride;
+
+  private:
+    void calculateElementsOffsets();
 };
 
-uint32_t GetShaderTypeDataCount(const ShaderDataType &type);
+uint32_t getShaderTypeDataCount(const ShaderDataType &type);
 
 //--buffer --//
 class VertexBuffer
@@ -145,12 +145,12 @@ class VertexBuffer
   public:
     virtual ~VertexBuffer() {}
 
-    virtual void Bind() const   = 0;
-    virtual void Unbind() const = 0;
+    virtual void bind() const   = 0;
+    virtual void unbind() const = 0;
 
-    virtual BufferLayout &GetBufferLayout()                      = 0;
-    virtual void SetBufferLayout(const BufferLayout &)           = 0;
-    virtual void SetData(uint32_t pos, void *data, uint32_t len) = 0;
+    virtual BufferLayout &getBufferLayout()                      = 0;
+    virtual void setBufferLayout(const BufferLayout &)           = 0;
+    virtual void setData(uint32_t pos, void *data, uint32_t len) = 0;
 
     // 注意这个static函数是在基类声明的, 会根据当前Renderer::GetAPI()返回VertexBuffer的派生类对象
     // static VertexBuffer *Create(float *vertices, uint32_t size); // static buffer
@@ -160,7 +160,7 @@ class VertexBuffer
     static std::shared_ptr<VertexBuffer> Create(uint32_t size);
 
   protected:
-    uint32_t m_VertexBuffer;
+    uint32_t m_vertexBuffer;
 };
 
 class IndexBuffer
@@ -168,13 +168,13 @@ class IndexBuffer
   public:
     virtual ~IndexBuffer() {}
 
-    virtual void Bind() const   = 0;
-    virtual void Unbind() const = 0;
+    virtual void bind() const   = 0;
+    virtual void unbind() const = 0;
 
-    virtual uint32_t GetCount() const = 0;
+    virtual uint32_t getCount() const = 0;
     static std::shared_ptr<IndexBuffer> Create(uint32_t *indices, uint32_t size);
 
   protected:
-    uint32_t m_IndexBuffer;
+    uint32_t m_indexBuffer;
 };
 } // namespace Airwave
