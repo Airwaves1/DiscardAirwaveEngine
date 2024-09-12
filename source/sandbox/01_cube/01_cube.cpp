@@ -1,4 +1,16 @@
-#include "airwave_engine.hpp"
+#include "window/aw_window.hpp"
+#include "render/renderer/renderer.hpp"
+#include "render/renderer/render_command.hpp"
+#include "render/renderer/renderer_api.hpp"
+#include "render/shader/shader.hpp"
+#include "render/shader/shader_library.hpp"
+#include "render/buffer/vertex_buffer.hpp"
+#include "render/buffer/vertex_array.hpp"
+#include "render/texture/texture.hpp"
+#include "render/texture/texture_2d.hpp"
+#include "utils/common.hpp"
+#include "utils/log.hpp"
+#include "utils/file_utils.hpp"
 #include <glm/glm.hpp>
 
 int main()

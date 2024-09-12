@@ -25,3 +25,6 @@
 #include "render/texture/texture_manager.hpp"
 
 
+//----------application----------
+#include "application/application.hpp"
+#include "application/entry_point.hpp"
