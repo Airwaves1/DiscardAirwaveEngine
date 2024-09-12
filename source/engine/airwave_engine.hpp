@@ -19,4 +19,9 @@
 #include "render/buffer/vertex_buffer.hpp"
 #include "render/buffer/vertex_array.hpp"
 
+//----------texture----------
+#include "render/texture/texture.hpp"
+#include "render/texture/texture_2d.hpp"
+#include "render/texture/texture_manager.hpp"
+
 

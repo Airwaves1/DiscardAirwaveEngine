@@ -5,47 +5,56 @@ int main()
 {
     Airwave::Log::Init();
 
-    auto window        = Airwave::AwWindow::Create(1200, 900, "01_cube");
+    auto window = Airwave::AwWindow::Create(1200, 900, "02_texture");
+
+    auto texture_0 = Airwave::Texture2D::Create(TEXTURE_DIR "container2.png");
+    auto texture_1 = Airwave::Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
+
     auto shaderLibrary = std::make_shared<Airwave::ShaderLibrary>();
-    shaderLibrary->load("cube", SHADER_DIR "00/cube.vert", SHADER_DIR "00/cube.frag");
+    shaderLibrary->load("cube", SHADER_DIR "00/cube_texture.vert",
+                        SHADER_DIR "00/cube_texture.frag");
+
+    shaderLibrary->get("cube")->bind();
+    shaderLibrary->get("cube")->uploadUniformInt("u_texture_0", 0);
+    shaderLibrary->get("cube")->uploadUniformInt("u_texture_1", 1);
 
     // a_position, a_normal
     std::vector<float> vertices = {
         // Front face
-        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // 0
-        1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // 1
-        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,   // 2
-        -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // 3
+        -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
+        1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,  // 1
+        1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // 2
+        -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // 3
 
         // Back face
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, // 4
-        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  // 5
-        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,   // 6
-        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f,  // 7
+        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, // 4
+        1.0f, -1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 0.0f,  // 5
+        1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f,   // 6
+        -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f,  // 7
 
         // Right face
-        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, // 8
-        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f,  // 9
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,   // 10
-        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f,  // 11
+        1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // 8
+        1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,  // 9
+        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // 10
+        1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // 11
 
         // Left face
-        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, // 12
-        -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,  // 13
-        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,   // 14
-        -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f,  // 15
+        -1.0f, -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // 12
+        -1.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,  // 13
+        -1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // 14
+        -1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // 15
 
         // Top face
-        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // 16
-        1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,  // 17
-        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // 18
-        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 19
+        -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // 16
+        1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 17
+        1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,   // 18
+        -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // 19
 
         // Bottom face
-        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, // 20
-        1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f,  // 21
-        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f,   // 22
-        -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f   // 23
+        -1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, // 20
+        1.0f, -1.0f, -1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f,  // 21
+        1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 1.0f,   // 22
+        -1.0f, -1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f   // 23
     };
 
     std::vector<uint32_t> indices = {
@@ -64,6 +73,7 @@ int main()
         vertexBuffer->setBufferLayout({
             {Airwave::ShaderDataType::FLOAT3, "a_position"},
             {Airwave::ShaderDataType::FLOAT3, "a_normal"},
+            {Airwave::ShaderDataType::FLOAT2, "a_uv"},
         });
         vertexArray->addVertexBuffer(vertexBuffer);
 
@@ -95,6 +105,8 @@ int main()
                                   glm::rotate(glm::mat4(1.0f), glm::radians((float)rotation),
                                               glm::vec3(0.5f, 1.0f, 0.0f)));
 
+        texture_0->bind(0);
+        texture_1->bind(1);
         vertexArray->bind();
         Airwave::RenderCommand::DrwaIndexed(vertexArray);
 

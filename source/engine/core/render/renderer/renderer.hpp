@@ -15,7 +15,6 @@ namespace Airwave
     {
     public:
 
-        // 这个函数真的有必要放到Renderer类里吗, Renderer2D类也要放?
 		static inline RendererAPI::APIType GetAPI() { return RendererAPI::GetAPIType(); }
 
         static void Init();
