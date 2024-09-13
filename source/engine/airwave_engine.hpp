@@ -28,3 +28,6 @@
 //----------application----------
 #include "application/application.hpp"
 #include "application/entry_point.hpp"
+
+//----------geometry----------
+#include "render/geometry/geometry_utils.hpp"
