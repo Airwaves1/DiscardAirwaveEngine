@@ -24,7 +24,7 @@ class EventObserver : public std::enable_shared_from_this<EventObserver>
         auto self = shared_from_this(); // 确保在 lambda 中持有当前对象的引用
         EventDispatcher::GetInstance().addObserver<T>(
             self,                            // 传递共享指针
-            [self, callback](const T &event) // 捕获 shared_ptr 来防止悬空引用
+            [self, callback](const T &event)
             {
                 callback(event); // 直接调用回调函数
             });

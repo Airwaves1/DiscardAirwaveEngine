@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 
 
+
+
 class Sandbox : public Airwave::Application
 {
   public:
@@ -10,6 +12,17 @@ class Sandbox : public Airwave::Application
 
     void onInit() override
     {
+        m_eventObserver = std::make_shared<Airwave::EventObserver>();
+        m_eventObserver->onEvent<Airwave::KeyPressedEvent>([](const Airwave::KeyPressedEvent &event) {
+            LOG_INFO("Key Pressed: {0}", event.ToString());
+        });
+        m_eventObserver->onEvent<Airwave::KeyReleasedEvent>([](const Airwave::KeyReleasedEvent &event) {
+            LOG_INFO("Key Released: {0}", event.ToString());
+        });
+        m_eventObserver->onEvent<Airwave::MouseMovedEvent>([](const Airwave::MouseMovedEvent &event) {
+            LOG_INFO("Mouse x: {0}, y: {1}", event.GetXPos(), event.GetYPos());
+        });
+
         m_texture_0 = Airwave::Texture2D::Create(TEXTURE_DIR "container2.png");
         m_texture_1 = Airwave::Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
 
@@ -80,6 +93,8 @@ class Sandbox : public Airwave::Application
 
     std::shared_ptr<Airwave::VertexArray> m_vertexArray;
     std::shared_ptr<Airwave::ShaderLibrary> m_shaderLibrary;
+
+    std::shared_ptr<Airwave::EventObserver> m_eventObserver;
 };
 
 Airwave::Application *CreateAirwaveEngineApplication() { return new Sandbox(); }
