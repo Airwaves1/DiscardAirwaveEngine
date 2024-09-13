@@ -23,13 +23,8 @@ class Sandbox : public Airwave::Application
 
         std::vector<Airwave::AWVertex> vertices_; 
         std::vector<uint32_t> indices;
-        // Airwave::GeometryUtils::CreateCube(vertices_, indices);
-        // Airwave::GeometryUtils::CreatePlane(vertices_, indices);
-        // Airwave::GeometryUtils::CreateSphere(vertices_, indices, 1.0f, 32, 32);
-        // Airwave::GeometryUtils::CreateCylinder(vertices_, indices, 1.0f, 1.0f, 1.0f, 32, 1);
-        Airwave::GeometryUtils::CreateTorus(vertices_, indices, 1.0f, 0.4f, 32, 32);
-        // Airwave::GeometryUtils::CreateTorusKnot(vertices_, indices, 1.0f, 0.4f, 64, 8, 2, 3);
-        // Airwave::GeometryUtils::CreateCone(vertices_, indices, 1.0f, 1.0f, 32, 1);
+        Airwave::GeometryUtils::CreateCube(vertices_, indices);
+
 
         std::vector<float> vertices = Airwave::GeometryUtils::ConvertAWVertexToFloatArray(vertices_);
 
