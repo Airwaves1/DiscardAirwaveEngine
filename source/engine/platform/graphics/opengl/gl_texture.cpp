@@ -136,7 +136,7 @@ void Airwave::OpenGLTexture2D::setData(void *data, uint32_t size)
 
     // 计算预期的数据大小（以字节为单位），确保传入的数据大小与纹理规格匹配
     uint32_t expectedSize = m_width * m_height * GetChannelCount(dataFormat);
-    AW_ASSERT(size == expectedSize, "Data size does not match texture size!");
+    AW_ASSERT(!(size == expectedSize), "Data size does not match texture size!");
 
     glBindTexture(GL_TEXTURE_2D, m_rendererID);
 

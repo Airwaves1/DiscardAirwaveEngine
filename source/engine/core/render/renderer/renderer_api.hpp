@@ -18,8 +18,6 @@ namespace Airwave
             OpenGL = 1,
             DirectX = 2,
             Vulkan = 3,
-            Metal = 4,
-            WebGPU = 5
         };
 
     public:
