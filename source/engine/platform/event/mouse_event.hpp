@@ -50,6 +50,8 @@ class MouseButtonPressedEvent : public MouseButtonEvent
     MouseButtonPressedEvent(MouseButton button) : MouseButtonEvent(button) {}
     EVENT_CLASS_TYPE(MouseButtonPressed)
 
+    MouseButton GetMouseButton() const { return m_Button; }
+
     std::string ToString() const override
     {
         std::stringstream a;

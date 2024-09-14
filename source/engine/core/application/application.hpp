@@ -25,6 +25,8 @@ class Application
     void quit();
     void mainLoop();
 
+    const ApplicationSettings &getSettings() const { return m_settings; }
+
   protected:
     virtual void onConfiguration(ApplicationSettings &settings) {}
     virtual void onInit() {}

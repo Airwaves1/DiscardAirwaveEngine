@@ -3,6 +3,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
+#include "utils/log.hpp"
 
 namespace Airwave
 {
@@ -26,21 +27,28 @@ class Camera
     void setPosition(const glm::vec3 &position)
     {
         m_position = position;
-        updateViewMatrix();
     }
     const glm::vec3 &getPosition() const { return m_position; }
 
-    // 朝向
-    void setForward(const glm::vec3 &forward)
+    // 上方向
+    void setUp(const glm::vec3 &up)
     {
-        m_forward = forward;
-        updateViewMatrix();
+        m_up = up;
     }
-    const glm::vec3 &getForward() const { return m_forward; }
+    const glm::vec3 &getUp() const { return m_up; }
+
+    // 右方向
+    void setRight(const glm::vec3 &right)
+    {
+        m_right = right;
+    }
+
+    const glm::vec3 &getRight() const { return m_right; }
 
   protected:
-    glm::vec3 m_position{0.0f, 0.0f, 0.0f}; // 位置
-    glm::vec3 m_forward{0.0f, 0.0f, -1.0f}; // 朝向
+    glm::vec3 m_position{0.0f, 0.0f, 0.0f};          // 位置
+    glm::vec3 m_up    = glm::vec3(0.0f, 1.0f, 0.0f); // 上方向
+    glm::vec3 m_right = glm::vec3(1.0f, 0.0f, 0.0f); // 右方向
 
     glm::mat4 m_viewMatrix{1.0f};
     glm::mat4 m_projectionMatrix{1.0f};
@@ -50,7 +58,7 @@ class PerspectiveCamera : public Camera
 {
   public:
     PerspectiveCamera(float fov, float aspect, float near, float far)
-        : m_fov(fov), m_aspect(aspect), m_near(near), m_far(far)
+        : m_fov(fov), m_aspect(aspect), m_near(near), m_far(far), Camera()
     {
         updateProjectionMatrix();
         updateViewMatrix();
@@ -58,7 +66,7 @@ class PerspectiveCamera : public Camera
 
     void updateViewMatrix() override
     {
-        m_viewMatrix = glm::lookAt(m_position, m_position + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
+        m_viewMatrix = glm::lookAt(m_position, glm::cross(m_right, m_up), m_up);
     }
 
     void updateProjectionMatrix() override
@@ -105,8 +113,9 @@ class PerspectiveCamera : public Camera
 class OrthographicCamera : public Camera
 {
   public:
-    OrthographicCamera(float left, float right, float bottom, float top, float near, float far)
-        : m_left(left), m_right(right), m_bottom(bottom), m_top(top), m_near(near), m_far(far)
+    OrthographicCamera(float leftSide, float rightSide, float bottom, float top, float near, float far)
+        : m_leftSide(leftSide), m_rightSide(rightSide), m_bottom(bottom), m_top(top), m_near(near), m_far(far),
+          Camera()
     {
         updateProjectionMatrix();
         updateViewMatrix();
@@ -114,23 +123,23 @@ class OrthographicCamera : public Camera
 
     void updateViewMatrix() override
     {
-        m_viewMatrix = glm::lookAt(m_position, m_position + m_forward, glm::vec3(0.0f, 1.0f, 0.0f));
+        m_viewMatrix = glm::lookAt(m_position, glm::cross(m_right, m_up), m_up);
     }
 
     void updateProjectionMatrix() override
     {
-        m_projectionMatrix = glm::ortho(m_left, m_right, m_bottom, m_top, m_near, m_far);
+        m_projectionMatrix = glm::ortho(m_leftSide, m_rightSide, m_bottom, m_top, m_near, m_far);
     }
 
-    void setLeft(float left)
+    void setLeftSide(float leftSide)
     {
-        m_left = left;
+        m_leftSide = leftSide;
         updateProjectionMatrix();
     }
 
-    void setRight(float right)
+    void setRightSide(float rightSide)
     {
-        m_right = right;
+        m_rightSide = rightSide;
         updateProjectionMatrix();
     }
 
@@ -158,16 +167,16 @@ class OrthographicCamera : public Camera
         updateProjectionMatrix();
     }
 
-    float getLeft() const { return m_left; }
-    float getRight() const { return m_right; }
+    float getLeftSide() const { return m_leftSide; }
+    float getRightSide() const { return m_rightSide; }
     float getBottom() const { return m_bottom; }
     float getTop() const { return m_top; }
     float getNear() const { return m_near; }
     float getFar() const { return m_far; }
 
   private:
-    float m_left;
-    float m_right;
+    float m_leftSide;
+    float m_rightSide;
     float m_bottom;
     float m_top;
     float m_near;

@@ -17,6 +17,10 @@
 #include "event/event_dispatcher.hpp"
 #include "event/event_observer.hpp"
 
+//----------camera----------
+#include "camera/camera.hpp"
+#include "camera/controller/trackball_controller.hpp"
+
 //----------renderer----------
 #include "render/renderer/renderer.hpp"
 #include "render/renderer/render_command.hpp"

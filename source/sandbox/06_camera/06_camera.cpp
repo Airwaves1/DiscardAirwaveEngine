@@ -9,16 +9,10 @@ class Sandbox : public Airwave::Application
 
     void onInit() override
     {
-        m_eventObserver = std::make_shared<Airwave::EventObserver>();
-        m_eventObserver->onEvent<Airwave::KeyPressedEvent>([](const Airwave::KeyPressedEvent &event) {
-            LOG_INFO("Key Pressed: {0}", event.ToString());
-        });
-        m_eventObserver->onEvent<Airwave::KeyReleasedEvent>([](const Airwave::KeyReleasedEvent &event) {
-            LOG_INFO("Key Released: {0}", event.ToString());
-        });
-        m_eventObserver->onEvent<Airwave::MouseMovedEvent>([](const Airwave::MouseMovedEvent &event) {
-            LOG_INFO("Mouse x: {0}, y: {1}", event.GetXPos(), event.GetYPos());
-        });
+        m_camera = std::make_shared<Airwave::PerspectiveCamera>(
+            45.0f, static_cast<float>(1200) / 900, 0.1f, 100.0f);
+        m_camera->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+        m_trackballController = std::make_shared<Airwave::TrackballController>(m_camera);
 
         m_texture_0 = Airwave::Texture2D::Create(TEXTURE_DIR "container2.png");
         m_texture_1 = Airwave::Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
@@ -31,12 +25,12 @@ class Sandbox : public Airwave::Application
         m_shaderLibrary->get("cube")->uploadUniformInt("u_texture_0", 0);
         m_shaderLibrary->get("cube")->uploadUniformInt("u_texture_1", 1);
 
-        std::vector<Airwave::AWVertex> vertices_; 
+        std::vector<Airwave::AWVertex> vertices_;
         std::vector<uint32_t> indices;
         Airwave::GeometryUtils::CreateCube(vertices_, indices);
 
-
-        std::vector<float> vertices = Airwave::GeometryUtils::ConvertAWVertexToFloatArray(vertices_);
+        std::vector<float> vertices =
+            Airwave::GeometryUtils::ConvertAWVertexToFloatArray(vertices_);
 
         m_vertexArray = Airwave::VertexArray::Create();
         {
@@ -58,6 +52,7 @@ class Sandbox : public Airwave::Application
 
     void onUpdate(float deltaTime) override
     {
+        m_camera->updateViewMatrix();
 
         static int rotation = 0;
         if (rotation == 999999999) rotation = 0;
@@ -68,20 +63,16 @@ class Sandbox : public Airwave::Application
 
         auto shader = m_shaderLibrary->get("cube");
         shader->bind();
-        shader->uploadUniformMat4("u_view", glm::lookAt(glm::vec3(0.0f, 0.0f, -10.0f),
-                                                        glm::vec3(0.0f, 0.0f, 0.0f),
-                                                        glm::vec3(0.0f, 1.0f, 0.0f)));
-        shader->uploadUniformMat4(
-            "u_projection", glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f));
-        shader->uploadUniformMat4("u_model",
-                                  glm::rotate(glm::mat4(1.0f), glm::radians((float)rotation),
-                                              glm::vec3(0.5f, 1.0f, 0.0f)));
+
+        shader->uploadUniformMat4("u_view", m_camera->getViewMatrix());
+        shader->uploadUniformMat4("u_projection", m_camera->getProjectionMatrix());
+        shader->uploadUniformMat4("u_model", glm::mat4(1.0f));
+
 
         m_texture_0->bind(0);
         m_texture_1->bind(1);
         m_vertexArray->bind();
         Airwave::RenderCommand::DrwaIndexed(m_vertexArray);
-
     }
 
   private:
@@ -91,7 +82,8 @@ class Sandbox : public Airwave::Application
     std::shared_ptr<Airwave::VertexArray> m_vertexArray;
     std::shared_ptr<Airwave::ShaderLibrary> m_shaderLibrary;
 
-    std::shared_ptr<Airwave::EventObserver> m_eventObserver;
+    std::shared_ptr<Airwave::TrackballController> m_trackballController;
+    std::shared_ptr<Airwave::Camera> m_camera;
 };
 
 Airwave::Application *CreateAirwaveEngineApplication() { return new Sandbox(); }

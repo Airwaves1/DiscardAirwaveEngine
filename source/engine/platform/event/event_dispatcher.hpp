@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include "event/event.hpp"
-
+#include "utils/log.hpp"
 
 namespace Airwave
 {
