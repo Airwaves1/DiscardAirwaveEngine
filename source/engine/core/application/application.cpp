@@ -15,6 +15,9 @@ void Application::start(int argc, char **argv)
     // 创建窗口
     m_window = AwWindow::Create(m_settings.width, m_settings.height, m_settings.title);
 
+    // 创建图形上下文
+    m_graphicContext = GraphicContext::Create(m_window.get());
+
     // 初始化
     onInit();
 

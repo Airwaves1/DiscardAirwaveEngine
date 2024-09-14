@@ -1,10 +1,21 @@
 #pragma once
 
 
+//----------window----------
 #include "window/aw_window.hpp"
+
+//----------utils----------
 #include "utils/log.hpp"
 #include "utils/common.hpp"
 #include "utils/file_utils.hpp"
+
+//----------event----------
+#include "event/event.hpp"
+#include "event/application_event.hpp"
+#include "event/key_event.hpp"
+#include "event/mouse_event.hpp"
+#include "event/event_dispatcher.hpp"
+#include "event/event_observer.hpp"
 
 //----------renderer----------
 #include "render/renderer/renderer.hpp"
@@ -28,3 +39,6 @@
 //----------application----------
 #include "application/application.hpp"
 #include "application/entry_point.hpp"
+
+//----------geometry----------
+#include "render/geometry/geometry_utils.hpp"

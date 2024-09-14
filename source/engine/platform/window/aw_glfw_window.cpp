@@ -5,6 +5,10 @@
 #include <GLFW/glfw3native.h>
 #include "graphics/graphic_contex.hpp"
 #include <vulkan/vulkan.h>
+#include "event/application_event.hpp"
+#include "event/event_dispatcher.hpp"
+#include "event/key_event.hpp"
+#include "event/mouse_event.hpp"
 
 namespace Airwave
 {
@@ -43,7 +47,7 @@ AwGLFWwindow::AwGLFWwindow(uint32_t width, uint32_t height, std::string title)
 
     glfwMakeContextCurrent(m_glfwWindow); // 设置当前上下文
 
-    m_graphicContext = GraphicContext::Create(this);
+    setupWindowCallbacks();
 
     glfwShowWindow(m_glfwWindow); // 显示窗口
 }
@@ -68,5 +72,175 @@ void AwGLFWwindow::pollEvents()
 
 void AwGLFWwindow::swapBuffers() { glfwSwapBuffers(m_glfwWindow); }
 
+void AwGLFWwindow::getMousePosition(double &x, double &y)
+{
+    glfwGetCursorPos(m_glfwWindow, &x, &y);
+}
+
+bool AwGLFWwindow::isMouseDown(MouseButton mouseButton)
+{
+    return glfwGetMouseButton(m_glfwWindow, mouseButton) == GLFW_PRESS;
+}
+
+bool AwGLFWwindow::isMouseUp(MouseButton mouseButton)
+{
+    return glfwGetMouseButton(m_glfwWindow, mouseButton) == GLFW_RELEASE;
+}
+
+bool AwGLFWwindow::isKeyDown(int key) { return glfwGetKey(m_glfwWindow, key) == GLFW_PRESS; }
+
+bool AwGLFWwindow::isKeyUp(int key) { return glfwGetKey(m_glfwWindow, key) == GLFW_RELEASE; }
+
+void AwGLFWwindow::setupWindowCallbacks()
+{
+    glfwSetWindowUserPointer(m_glfwWindow, this);
+
+    glfwSetFramebufferSizeCallback(m_glfwWindow,
+                                   [](GLFWwindow *window, int width, int height)
+                                   {
+                                       auto *awWindow = static_cast<AwGLFWwindow *>(
+                                           glfwGetWindowUserPointer(window));
+                                       if (awWindow)
+                                       {
+                                           WindowResizeEvent event(width, height);
+                                           EventDispatcher::GetInstance().dispatch(event);
+                                       }
+                                   });
+    glfwSetWindowFocusCallback(m_glfwWindow,
+                               [](GLFWwindow *window, int focused)
+                               {
+                                   auto *awWindow = static_cast<AwGLFWwindow *>(
+                                       glfwGetWindowUserPointer(window));
+                                   if (awWindow)
+                                   {
+                                       if (focused)
+                                       {
+                                           WindowFocusEvent event{};
+                                           EventDispatcher::GetInstance().dispatch(event);
+                                       }
+                                       else
+                                       {
+                                           WindowLostFocusEvent event{};
+                                           EventDispatcher::GetInstance().dispatch(event);
+                                       }
+                                   }
+                               });
+
+    glfwSetWindowCloseCallback(m_glfwWindow,
+                               [](GLFWwindow *window)
+                               {
+                                   auto *awWindow = static_cast<AwGLFWwindow *>(
+                                       glfwGetWindowUserPointer(window));
+                                   if (awWindow)
+                                   {
+                                       WindowCloseEvent event{};
+                                       EventDispatcher::GetInstance().dispatch(event);
+                                   }
+                               });
+
+    glfwSetWindowPosCallback(m_glfwWindow,
+                             [](GLFWwindow *window, int xpos, int ypos)
+                             {
+                                 auto *awWindow =
+                                     static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+                                 if (awWindow)
+                                 {
+                                     WindowMoveEvent event(xpos, ypos);
+                                     EventDispatcher::GetInstance().dispatch(event);
+                                 }
+                             });
+
+    glfwSetKeyCallback(m_glfwWindow,
+                       [](GLFWwindow *window, int key, int scancode, int action, int mods)
+                       {
+                           auto *awWindow =
+                               static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+                           if (awWindow)
+                           {
+                               switch (action)
+                               {
+                                   case GLFW_PRESS:
+                                   {
+                                       KeyPressedEvent event(key, 0);
+                                       EventDispatcher::GetInstance().dispatch(event);
+                                       break;
+                                   }
+                                   case GLFW_RELEASE:
+                                   {
+                                       KeyReleasedEvent event(key);
+                                       EventDispatcher::GetInstance().dispatch(event);
+                                       break;
+                                   }
+                                   case GLFW_REPEAT:
+                                   {
+                                       KeyPressedEvent event(key, 1);
+                                       EventDispatcher::GetInstance().dispatch(event);
+                                       break;
+                                   }
+                               }
+                           }
+                       });
+
+    glfwSetCharCallback(m_glfwWindow,
+                        [](GLFWwindow *window, unsigned int keycode)
+                        {
+                            auto *awWindow =
+                                static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+                            if (awWindow)
+                            {
+                                KeyTypedEvent event(keycode);
+                                EventDispatcher::GetInstance().dispatch(event);
+                            }
+                        });
+
+    glfwSetMouseButtonCallback(
+        m_glfwWindow,
+        [](GLFWwindow *window, int button, int action, int mods)
+        {
+            auto *awWindow = static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+            if (awWindow)
+            {
+                switch (action)
+                {
+                    case GLFW_PRESS:
+                    {
+                        MouseButtonPressedEvent event(static_cast<MouseButton>(button));
+                        EventDispatcher::GetInstance().dispatch(event);
+                        break;
+                    }
+                    case GLFW_RELEASE:
+                    {
+                        MouseButtonReleasedEvent event(static_cast<MouseButton>(button));
+                        EventDispatcher::GetInstance().dispatch(event);
+                        break;
+                    }
+                }
+            }
+        });
+
+    glfwSetCursorPosCallback(
+        m_glfwWindow,
+        [](GLFWwindow *window, double xpos, double ypos)
+        {
+            auto *awWindow = static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+            if (awWindow)
+            {
+                MouseMovedEvent event(static_cast<float>(xpos), static_cast<float>(ypos));
+                EventDispatcher::GetInstance().dispatch(event);
+            }
+        });
+
+    glfwSetScrollCallback(
+        m_glfwWindow,
+        [](GLFWwindow *window, double xoffset, double yoffset)
+        {
+            auto *awWindow = static_cast<AwGLFWwindow *>(glfwGetWindowUserPointer(window));
+            if (awWindow)
+            {
+                MouseScrolledEvent event(static_cast<float>(xoffset), static_cast<float>(yoffset));
+                EventDispatcher::GetInstance().dispatch(event);
+            }
+        });
+}
 
 } // namespace Airwave

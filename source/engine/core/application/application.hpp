@@ -36,6 +36,8 @@ class Application
     std::chrono::steady_clock::time_point m_lastFrameTimePoint;
 
     std::unique_ptr<AwWindow> m_window;
+    
+    std::shared_ptr<GraphicContext> m_graphicContext;
 
   private:
     void parseArguments(int argc, char **argv);
