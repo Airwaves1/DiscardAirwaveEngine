@@ -1,6 +1,9 @@
 #pragma once
 #include "event/event_dispatcher.hpp"
-
+#include "event/event.hpp"
+#include "event/key_event.hpp"
+#include "event/mouse_event.hpp"
+#include "event/application_event.hpp"
 namespace Airwave
 {
 class EventDispatcher;
