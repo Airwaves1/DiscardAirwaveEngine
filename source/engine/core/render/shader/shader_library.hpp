@@ -26,6 +26,7 @@ class ShaderLibrary
     bool exists(const std::string &name) const { return m_shaders.find(name) != m_shaders.end(); }
 
   private:
+    std::shared_ptr<Shader> m_tmpCreateShader;
     std::unordered_map<std::string, std::shared_ptr<Shader>> m_shaders;
 };
 } // namespace Airwave

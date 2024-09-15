@@ -33,6 +33,7 @@
 //----------buffer----------
 #include "render/buffer/vertex_buffer.hpp"
 #include "render/buffer/vertex_array.hpp"
+#include "render/buffer/framebuffer.hpp"
 
 //----------texture----------
 #include "render/texture/texture.hpp"

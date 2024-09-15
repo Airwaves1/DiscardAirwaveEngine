@@ -10,7 +10,8 @@ void Renderer::Init() { RenderCommand::Init(); }
 
 void Renderer::BeginScene(std::shared_ptr<Camera> camera)
 {
-    s_SceneData->ViewProjectionMatrix = camera->getViewMatrix() * camera->getProjectionMatrix();
+    s_SceneData->ViewMatrix = camera->getViewMatrix();
+    s_SceneData->ProjectionMatrix = camera->getProjectionMatrix();
 }
 
 void Renderer::EndScene() {}
@@ -19,8 +20,9 @@ void Renderer::Submit(const std::shared_ptr<Shader> &shader, const std::shared_p
                       const glm::mat4 &transform)
 {
     shader->bind();
-    shader->uploadUniformMat4("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-    shader->uploadUniformMat4("u_Model", transform);
+        shader->uploadUniformMat4("u_viewMatrix", s_SceneData->ViewMatrix);
+        shader->uploadUniformMat4("u_projectionMatrix", s_SceneData->ProjectionMatrix);
+        shader->uploadUniformMat4("u_modelMatrix", transform);
 
     RenderCommand::DrwaIndexed(va);
 }

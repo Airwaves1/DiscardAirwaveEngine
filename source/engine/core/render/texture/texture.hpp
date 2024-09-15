@@ -34,8 +34,10 @@ enum class TextureInternalFormat
     RGB16F   = 2,
     RGBA16F  = 3,
     DEPTH24  = 4,
-    DEPTH32F = 5
+    DEPTH32F = 5,
+    DEPTH24STENCIL8 = 6
 };
+
 
 struct TextureSpecification
 {

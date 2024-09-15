@@ -240,6 +240,8 @@ GLenum OpenGLTexture2D::TextureInternalFormatToGL(TextureInternalFormat format)
             return GL_DEPTH_COMPONENT24;
         case TextureInternalFormat::DEPTH32F:
             return GL_DEPTH_COMPONENT32F;
+        case TextureInternalFormat::DEPTH24STENCIL8:
+            return GL_DEPTH24_STENCIL8;
         default:
             AW_ASSERT(false, "Unknown TextureInternalFormat!");
             return 0;
