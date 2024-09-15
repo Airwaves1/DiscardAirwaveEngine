@@ -7,7 +7,7 @@
 namespace Airwave
 {
 
-    Shader* Shader::Create(const std::string &vertexSrc, const std::string &fragmentSrc, bool fromFile)
+    std::shared_ptr<Shader> Shader::Create(const std::string &vertexSrc, const std::string &fragmentSrc, bool fromFile)
     {
         RendererAPI::APIType type = Renderer::GetAPI();
         switch (type)
@@ -16,7 +16,7 @@ namespace Airwave
             LOG_ERROR("RendererAPI::None is not supported");
             return nullptr;
         case RendererAPI::APIType::OpenGL:
-            return new OpenGLShader(vertexSrc, fragmentSrc, fromFile);
+            return std::make_shared<OpenGLShader>(vertexSrc, fragmentSrc, fromFile);
         default:
             LOG_ERROR("Unknown RendererAPI");
             return nullptr;

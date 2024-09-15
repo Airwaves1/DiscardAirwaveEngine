@@ -24,16 +24,16 @@ namespace Airwave
             return m_shaders[name];
         }
         
-        Shader* shader = Shader::Create(vertex, fragment, fromFile);
+        auto shader = Shader::Create(vertex, fragment, fromFile);
         if(!shader)
         {
             LOG_ERROR("Failed to create shader {0}", name);
             return nullptr;
         }
 
-        auto sharedShader = std::shared_ptr<Shader>(shader);
-        add(name, sharedShader);
-        return sharedShader;
+
+        add(name, shader);
+        return shader;
     }
 
     std::shared_ptr<Shader> ShaderLibrary::load(const std::string &name, const std::string &filepath)

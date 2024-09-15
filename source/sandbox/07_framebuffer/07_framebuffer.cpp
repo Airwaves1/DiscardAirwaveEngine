@@ -10,7 +10,12 @@ class Sandbox : public Airwave::Application
 
     void onInit() override
     {
-        m_framebuffer = Airwave::Framebuffer::Create(1200, 900, Airwave::FramebufferSpecification());
+        m_fullScreenQuad = std::make_shared<Airwave::FullScreenQuad>();
+        Airwave::FramebufferSpecification spec;
+        spec.enableMSAA = true;
+        spec.samples = 4;
+        m_framebuffer = Airwave::Framebuffer::Create(1200, 900, spec);
+
         m_camera = std::make_shared<Airwave::PerspectiveCamera>(
             45.0f, static_cast<float>(1200) / 900, 0.1f, 100.0f);
         m_camera->setPosition(glm::vec3(0.0f, 0.0f, 8.0f));
@@ -72,13 +77,13 @@ class Sandbox : public Airwave::Application
         m_framebuffer->unbind();
 
         // 渲染全屏四边形
-        // m_fullScreenQuad->render(m_framebuffer->getColorAttachments()[0]);
+        m_fullScreenQuad->render(m_framebuffer);
 
     }
 
   private:
     std::shared_ptr<Airwave::Framebuffer> m_framebuffer;
-    // std::shared_ptr<Airwave::FullScreenQuad> m_fullScreenQuad;
+    std::shared_ptr<Airwave::FullScreenQuad> m_fullScreenQuad;
 
     std::shared_ptr<Airwave::Texture2D> m_texture_0;
     std::shared_ptr<Airwave::Texture2D> m_texture_1;

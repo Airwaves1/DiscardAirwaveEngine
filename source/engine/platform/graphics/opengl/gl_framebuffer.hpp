@@ -32,7 +32,7 @@ class OpenGLFramebuffer : public Framebuffer
 
     virtual void setMSAA(bool enable) override;
 
-    virtual void blitMSAAToDefaultFramebuffer(const uint32_t resolveFramebufferID) const override;
+    virtual void resolve(const uint32_t resolveFramebufferID) const override;
 
     virtual glm::vec4 readPixel(uint32_t attachmentIndex, uint32_t x, uint32_t y) const override;
 

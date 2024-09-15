@@ -54,8 +54,16 @@ void OpenGLFramebuffer::invalidate()
         spec.internalFormat  = TextureInternalFormat::RGBA8;
         spec.format          = TextureFormat::RGBA;
         auto colorAttachment = Texture2D::Create(m_width, m_height, spec);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D,
-                               colorAttachment->getRendererID(), 0);
+        if (m_spec.enableMSAA)
+        {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
+                                   GL_TEXTURE_2D_MULTISAMPLE, colorAttachment->getRendererID(), 0);
+        }
+        else
+        {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D,
+                                   colorAttachment->getRendererID(), 0);
+        }
         m_colorAttachments.push_back(colorAttachment);
     }
 
@@ -164,7 +172,7 @@ void OpenGLFramebuffer::setMSAA(bool enable)
     invalidate(); // 重新创建帧缓冲
 }
 
-void OpenGLFramebuffer::blitMSAAToDefaultFramebuffer(const uint32_t resolveFramebufferID) const
+void OpenGLFramebuffer::resolve(const uint32_t resolveFramebufferID) const
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebufferID);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFramebufferID);

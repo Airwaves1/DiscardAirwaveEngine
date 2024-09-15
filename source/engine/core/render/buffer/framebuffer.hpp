@@ -48,7 +48,7 @@ class Framebuffer
     virtual void setMSAA(bool enable) = 0;
 
     // 将多重采样的纹理转换为普通附件
-    virtual void blitMSAAToDefaultFramebuffer(const uint32_t resolveFramebufferID) const = 0;
+    virtual void resolve(const uint32_t resolveFramebufferID) const = 0;
 
     // 读取像素获取单点颜色
     virtual glm::vec4 readPixel(uint32_t attachmentIndex, uint32_t x, uint32_t y) const = 0;

@@ -3,6 +3,7 @@
 #include "utils/common.hpp"
 #include <glm/glm.hpp>
 #include <string>
+#include <memory>
 
 namespace Airwave
 {
@@ -36,7 +37,7 @@ class Shader
     virtual void uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) = 0;
 
   public:
-    static Shader *Create(const std::string &vertexSrc, const std::string &fragmentSrc,
+    static std::shared_ptr<Shader> Create(const std::string &vertexSrc, const std::string &fragmentSrc,
                           bool fromFile = true);
 
   protected:
