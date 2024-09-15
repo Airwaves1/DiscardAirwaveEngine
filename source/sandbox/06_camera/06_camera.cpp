@@ -52,8 +52,6 @@ class Sandbox : public Airwave::Application
 
     void onUpdate(float deltaTime) override
     {
-        m_camera->updateViewMatrix();
-
         static int rotation = 0;
         if (rotation == 999999999) rotation = 0;
         rotation++;

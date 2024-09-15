@@ -1,141 +1,126 @@
 #include "trackball_controller.hpp"
 #include "utils/log.hpp"
-
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 namespace Airwave
 {
-TrackballController::TrackballController(std::shared_ptr<Camera> camera, const glm::vec3 &target,
-                                         float distance, float sensitivity, float zoomSpeed,
-                                         float minDistance, float maxDistance)
-    : m_camera(camera), m_target(target), m_distance(distance), m_sensitivity(sensitivity),
-      m_zoomSpeed(zoomSpeed)
+TrackballController::TrackballController(std::shared_ptr<Camera> camera, const glm::vec3 &target)
+    : m_camera(camera), m_target(target), m_zoomSpeed(0.2f), m_rotateSpeed(0.01f), m_panSpeed(0.02f),
+      m_lastMousePos(0.0f), m_limitDistance(0.1f, 100.0f), b_isPanning(false), b_isRotating(false)
 {
-    m_eventObserver = std::make_shared<EventObserver>();
-    setupBasicEvent();
+    setUpBasicEvent();
 }
 
-void TrackballController::rotate(float deltaX, float deltaY)
+void TrackballController::setUpBasicEvent()
 {
-    // 绕right轴旋转
-    auto rotateRight =
-        glm::rotate(glm::mat4(1.0f), glm::radians(-deltaY * m_sensitivity), m_camera->getRight());
-    // 影响当前相机的up和位置
-    auto up = rotateRight * glm::vec4(m_camera->getUp(), 0.0f);
-    m_camera->setUp(glm::vec3(up));
-    auto position = rotateRight * glm::vec4(m_camera->getPosition() - m_target, 1.0f);
-    m_camera->setPosition(glm::vec3(position) + m_target);
+    if (m_eventObserver == nullptr)
+    {
+        m_eventObserver = std::make_shared<EventObserver>();
+    }
 
-    // 绕up轴旋转
-    auto rotateUp =
-        glm::rotate(glm::mat4(1.0f), glm::radians(-deltaX * m_sensitivity), m_camera->getUp());
-    // 影响当前相机的right和位置
-    auto right = rotateUp * glm::vec4(m_camera->getRight(), 0.0f);
-    m_camera->setRight(glm::vec3(right));
-    position = rotateUp * glm::vec4(m_camera->getPosition() - m_target, 1.0f);
-    m_camera->setPosition(glm::vec3(position) + m_target);
+    m_eventObserver->onEvent<MouseButtonPressedEvent>(
+        [this](const MouseButtonPressedEvent &e)
+        {
+            if (e.GetMouseButton() == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                b_isRotating = true;
+                b_isPanning  = false;
 
-    LOG_DEBUG("rotate");
+                m_lastMousePos = glm::vec2(e.GetXPos(), e.GetYPos());
+            }
+            if (e.GetMouseButton() == MouseButton::MOUSE_BUTTON_MIDDLE)
+            {
+                b_isPanning  = true;
+                b_isRotating = false;
+
+                m_lastMousePos = glm::vec2(e.GetXPos(), e.GetYPos());
+            }
+        });
+
+    m_eventObserver->onEvent<MouseButtonReleasedEvent>(
+        [this](const MouseButtonReleasedEvent &e)
+        {
+            if (e.GetMouseButton() == MouseButton::MOUSE_BUTTON_LEFT)
+            {
+                b_isRotating = false;
+            }
+            if (e.GetMouseButton() == MouseButton::MOUSE_BUTTON_MIDDLE)
+            {
+                b_isPanning = false;
+            }
+        });
+
+    m_eventObserver->onEvent<MouseScrolledEvent>([this](const MouseScrolledEvent &e)
+                                                 { zoom(e.GetYOffset()); });
+
+    m_eventObserver->onEvent<MouseMovedEvent>(
+        [this](const MouseMovedEvent &e)
+        {
+            if (b_isRotating)
+            {
+                glm::vec2 delta = glm::vec2(e.GetXPos(), e.GetYPos()) - m_lastMousePos;
+                m_lastMousePos  = glm::vec2(e.GetXPos(), e.GetYPos());
+                rotate(delta);
+            }
+            if (b_isPanning)
+            {
+                glm::vec2 delta = glm::vec2(e.GetXPos(), e.GetYPos()) - m_lastMousePos;
+                m_lastMousePos  = glm::vec2(e.GetXPos(), e.GetYPos());
+                pan(delta);
+            }
+        });
 }
 
 void TrackballController::zoom(float delta)
 {
-    m_distance = std::clamp(m_distance - delta * m_zoomSpeed, m_minDistance, m_maxDistance);
 
-    glm::vec3 direction = m_camera->getPosition() - m_target;
-    m_camera->setPosition(m_target + glm::normalize(direction) * m_distance);
+    float distance = glm::distance(m_camera->getPosition(), m_target);
+    distance -= delta * m_zoomSpeed;
 
-    LOG_DEBUG("zoom");
-    
+    // 限制相机距离
+    distance = glm::clamp(distance, m_limitDistance.x, m_limitDistance.y);
+
+    // 计算新的相机位置
+    glm::vec3 dir = glm::normalize(m_camera->getPosition() - m_target);
+    m_camera->setPosition(m_target + dir * distance);
 }
 
-void TrackballController::pan(float deltaX, float deltaY)
+void TrackballController::rotate(const glm::vec2 &delta)
 {
-    if (!m_camera) return;
+    glm::vec3 dir = m_camera->getPosition() - m_target;
+    float distance = glm::length(dir);
 
-    // 获取相机的右方向和上方向
-    glm::vec3 right = m_camera->getRight();
-    glm::vec3 up = m_camera->getUp();
-    
-    // 计算平移量，乘以适当的敏感度来调整平移速度
-    glm::vec3 move = right * deltaX * m_sensitivity + up * deltaY * m_sensitivity;
+    // 计算旋转角度
+    glm::vec3 right = m_camera->getRightDirection();
+    glm::vec3 up    = m_camera->getUpDirection();
 
-    // 在世界坐标系中平移目标点
-    m_target += move;
+    glm::quat rot = glm::angleAxis(-delta.y * m_rotateSpeed, right) *
+                    glm::angleAxis(-delta.x * m_rotateSpeed, up);
 
-    // 更新相机位置，保持相机与目标点的距离不变
-    glm::vec3 direction = glm::normalize(m_camera->getPosition() - m_target);
-    m_camera->setPosition(m_target + direction * m_distance);
+    // 计算新的相机位置
+    dir = glm::normalize(glm::rotate(rot, dir));
+    m_camera->setPosition(m_target + dir * distance);
 
-    // 更新视图矩阵
-    m_camera->updateViewMatrix();
-
-    LOG_DEBUG("pan");
-    
+    // 计算新的相机旋转
+    glm::quat newRot = glm::normalize(rot * m_camera->getRotation());
+    m_camera->setRotation(newRot);
 }
 
 
-void TrackballController::setupBasicEvent()
+void TrackballController::pan(const glm::vec2 &delta)
 {
-    if (m_eventObserver)
-    {
-        static bool isLeftMousePressed   = false;
-        static bool isMiddleMousePressed = false;
+    glm::vec3 dir  = m_camera->getPosition() - m_target;
+    float distance = glm::length(dir);
 
-        m_eventObserver->onEvent<MouseScrolledEvent>([this](const MouseScrolledEvent &event)
-                                                     { this->zoom(event.GetYOffset()); });
+    // 计算平移距离
+    glm::vec3 right = m_camera->getRightDirection();
+    glm::vec3 up    = m_camera->getUpDirection();
+    glm::vec3 pan   = -right * delta.x * m_panSpeed + up * delta.y * m_panSpeed;
 
-        // 处理鼠标按下事件（左键用于旋转，中键用于平移）
-        m_eventObserver->onEvent<MouseButtonPressedEvent>(
-            [this](const MouseButtonPressedEvent &event)
-            {
-                if (event.GetMouseButton() == MouseButton::MOUSE_BUTTON_LEFT)
-                {
-                    isLeftMousePressed = true;
-                }
-                else if (event.GetMouseButton() == MouseButton::MOUSE_BUTTON_MIDDLE)
-                {
-                    isMiddleMousePressed = true;
-                }
-            });
-
-        // 处理鼠标释放事件
-        m_eventObserver->onEvent<MouseButtonReleasedEvent>(
-            [this](const MouseButtonReleasedEvent &event)
-            {
-                if (event.GetMouseButton() == MouseButton::MOUSE_BUTTON_LEFT)
-                {
-                    isLeftMousePressed = false;
-                }
-                else if (event.GetMouseButton() == MouseButton::MOUSE_BUTTON_MIDDLE)
-                {
-                    isMiddleMousePressed = false;
-                }
-            });
-
-        // 处理鼠标移动事件
-        m_eventObserver->onEvent<MouseMovedEvent>(
-            [this](const MouseMovedEvent &event)
-            {
-                static glm::vec2 lastPos =
-                    glm::vec2(event.GetXPos(), event.GetYPos()); // 初始化为当前位置
-
-                glm::vec2 currentPos = glm::vec2(event.GetXPos(), event.GetYPos());
-                glm::vec2 delta      = currentPos - lastPos;
-
-                if (isLeftMousePressed)
-                {
-                    this->rotate(delta.x, delta.y);
-                }
-                else if (isMiddleMousePressed)
-                {
-                    this->pan(delta.x, delta.y);
-                }
-
-                lastPos = currentPos;
-            });
-    }
+    // 计算新的相机位置
+    m_camera->setPosition(m_camera->getPosition() + pan);
+    m_target += pan;
 }
 
 } // namespace Airwave

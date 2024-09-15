@@ -204,13 +204,17 @@ void AwGLFWwindow::setupWindowCallbacks()
                 {
                     case GLFW_PRESS:
                     {
-                        MouseButtonPressedEvent event(static_cast<MouseButton>(button));
+                        double x, y;
+                        glfwGetCursorPos(window, &x, &y);
+                        MouseButtonPressedEvent event(static_cast<MouseButton>(button), static_cast<float>(x), static_cast<float>(y));
                         EventDispatcher::GetInstance().dispatch(event);
                         break;
                     }
                     case GLFW_RELEASE:
                     {
-                        MouseButtonReleasedEvent event(static_cast<MouseButton>(button));
+                        double x, y;
+                        glfwGetCursorPos(window, &x, &y);
+                        MouseButtonReleasedEvent event(static_cast<MouseButton>(button), static_cast<float>(x), static_cast<float>(y));
                         EventDispatcher::GetInstance().dispatch(event);
                         break;
                     }

@@ -36,18 +36,21 @@ class MouseButtonEvent : public Event
 {
   public:
     EVENT_CLASS_GET_CATEGORY(EventCategoryInput | EventCategoryMouseButton)
-    MouseButtonEvent(MouseButton button) : m_Button(button) {}
+    MouseButtonEvent(MouseButton button, float xPos, float yPos) : m_Button(button), m_XPos(xPos), m_YPos(yPos) {}
     virtual ~MouseButtonEvent() {}
     inline MouseButton GetMouseButton() const { return m_Button; };
+    inline float GetXPos() const { return m_XPos; }
+    inline float GetYPos() const { return m_YPos; }
 
   protected:
     MouseButton m_Button;
+    float m_XPos, m_YPos;
 };
 
 class MouseButtonPressedEvent : public MouseButtonEvent
 {
   public:
-    MouseButtonPressedEvent(MouseButton button) : MouseButtonEvent(button) {}
+    MouseButtonPressedEvent(MouseButton button, float xPos, float yPos) : MouseButtonEvent(button, xPos, yPos) {}
     EVENT_CLASS_TYPE(MouseButtonPressed)
 
     MouseButton GetMouseButton() const { return m_Button; }
@@ -65,7 +68,7 @@ class MouseButtonPressedEvent : public MouseButtonEvent
 class MouseButtonReleasedEvent : public MouseButtonEvent
 {
   public:
-    MouseButtonReleasedEvent(MouseButton button) : MouseButtonEvent(button) {}
+    MouseButtonReleasedEvent(MouseButton button, float xPos, float yPos) : MouseButtonEvent(button, xPos, yPos) {}
     EVENT_CLASS_TYPE(MouseButtonReleased)
 
     std::string ToString() const override
