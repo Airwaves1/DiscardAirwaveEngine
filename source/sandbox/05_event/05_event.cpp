@@ -11,10 +11,10 @@ class Sandbox : public Airwave::Application
     {
         m_eventObserver = std::make_shared<Airwave::EventObserver>();
         m_eventObserver->onEvent<Airwave::KeyPressedEvent>([](const Airwave::KeyPressedEvent &event) {
-            LOG_INFO("Key Pressed: {0}", event.ToString());
+            LOG_INFO("Key Pressed: {0}", event.toString());
         });
         m_eventObserver->onEvent<Airwave::KeyReleasedEvent>([](const Airwave::KeyReleasedEvent &event) {
-            LOG_INFO("Key Released: {0}", event.ToString());
+            LOG_INFO("Key Released: {0}", event.toString());
         });
         m_eventObserver->onEvent<Airwave::MouseMovedEvent>([](const Airwave::MouseMovedEvent &event) {
             LOG_INFO("Mouse x: {0}, y: {1}", event.GetXPos(), event.GetYPos());

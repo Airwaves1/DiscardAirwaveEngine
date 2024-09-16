@@ -20,41 +20,6 @@ static uint32_t StringToGLShaderType(const std::string &type)
     return -1;
 }
 
-float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized
-                         // Device Coordinates.
-    // positions   // texCoords
-    -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-
-    -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
-
-const char *vShaderCode = R"(
-        #version 410 core
-        layout(location = 0) in vec3 a_Pos;
-        layout(location = 1) in vec2 a_TexCoord;
-
-        layout(location = 0) out vec2 v_TexCoord;
-
-        void main()
-        {
-            gl_Position = vec4(a_Pos, 1.0);
-            v_TexCoord = a_TexCoord;
-        }
-    )";
-
-const char *fShaderCode = R"(
-        #version 410 core
-        layout(location = 0) in vec2 v_TexCoord;
-
-        uniform sampler2D u_ScreenTexture;
-
-        out vec4 FragColor;
-
-        void main()
-        {
-            FragColor = texture(u_ScreenTexture, v_TexCoord);
-        }
-    )";
-
 OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragment, bool fromFile)
 {
     std::string vertexSrc;
@@ -73,8 +38,20 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
     m_openGLSourceCode[ShaderType::Vertex]   = vertexSrc;
     m_openGLSourceCode[ShaderType::Fragment] = fragmentSrc;
 
+    compile();
+}
+
+OpenGLShader::~OpenGLShader() { glDeleteProgram(m_rendererID); }
+
+void OpenGLShader::compile()
+{
+    if(m_rendererID != -1)
+    {
+        glDeleteProgram(m_rendererID);
+    }
+
     GLuint vertexShader  = glCreateShader(GL_VERTEX_SHADER);
-    const GLchar *source = (const char *)vertexSrc.c_str();
+    const GLchar *source = (const char *)m_openGLSourceCode[ShaderType::Vertex].c_str();
     glShaderSource(vertexShader, 1, &source, NULL);
     glCompileShader(vertexShader);
 
@@ -96,7 +73,7 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    source                = (const char *)fragmentSrc.c_str();
+    source                = (const char *)m_openGLSourceCode[ShaderType::Fragment].c_str();
     glShaderSource(fragmentShader, 1, &source, NULL);
     glCompileShader(fragmentShader);
 
@@ -147,7 +124,13 @@ OpenGLShader::OpenGLShader(const std::string &vertex, const std::string &fragmen
     glDetachShader(m_rendererID, fragmentShader);
 }
 
-OpenGLShader::~OpenGLShader() { glDeleteProgram(m_rendererID); }
+void OpenGLShader::addMacro(const std::string macroNanme, const std::string &macroValue)
+{
+    std::string define = "#define " + macroNanme + " " + macroValue + "\n";
+    m_openGLSourceCode[ShaderType::Vertex] = define + m_openGLSourceCode[ShaderType::Vertex];
+    m_openGLSourceCode[ShaderType::Fragment] = define + m_openGLSourceCode[ShaderType::Fragment];
+    compile();
+}
 
 void OpenGLShader::bind() const { glUseProgram(m_rendererID); }
 

@@ -45,7 +45,7 @@ namespace Airwave
 		virtual const char* GetName() const = 0;
 		virtual const EventType GetEventType() const = 0;
 		virtual int GetCategoryFlag() const = 0;
-		virtual std::string ToString() const { return GetName(); }
+		virtual std::string toString() const { return GetName(); }
 		inline bool IsInCategory(EventCategory type) 
 		{
 			return GetCategoryFlag() & type;

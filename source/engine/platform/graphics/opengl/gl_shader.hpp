@@ -13,6 +13,9 @@ class OpenGLShader : public Shader
 
     ~OpenGLShader();
 
+    void compile() override;
+    void addMacro(const std::string macroNanme, const std::string& macroValue) override;
+
     void bind() const override;
     void unbind() const override;
 

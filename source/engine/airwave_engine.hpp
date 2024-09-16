@@ -41,6 +41,18 @@
 #include "render/texture/texture_manager.hpp"
 
 
+//----------geometry----------
+#include "render/geometry/geometry.hpp"
+#include "render/geometry/geometry_utils.hpp"
+
+//----------material----------
+#include "render/material/material.hpp"
+#include "render/material/basic_material.hpp"
+
+//----------object----------
+#include "render/object/mesh.hpp"
+#include "render/object/fullscreen_quad.hpp"
+
 //----------application----------
 #include "application/application.hpp"
 #include "application/entry_point.hpp"

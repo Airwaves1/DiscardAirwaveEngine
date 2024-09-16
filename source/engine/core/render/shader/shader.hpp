@@ -36,11 +36,16 @@ class Shader
     virtual void uploadUniformMat3(const std::string &name, const glm::mat3 &matrix) = 0;
     virtual void uploadUniformMat4(const std::string &name, const glm::mat4 &matrix) = 0;
 
+    virtual void compile() = 0;
+    virtual void addMacro(const std::string macroNanme, const std::string& macroValue) = 0;
+
   public:
-    static std::shared_ptr<Shader> Create(const std::string &vertexSrc, const std::string &fragmentSrc,
-                          bool fromFile = true);
+    static std::shared_ptr<Shader> Create(const std::string &vertexSrc,
+                                          const std::string &fragmentSrc, bool fromFile = true);
 
   protected:
+    std::string vertexShaderSource;
+    std::string fragmentShaderSource;
     uint32_t m_rendererID;
     std::string m_name;
 };

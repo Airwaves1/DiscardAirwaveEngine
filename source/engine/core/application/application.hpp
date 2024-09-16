@@ -3,6 +3,7 @@
 #include "utils/common.hpp"
 #include "utils/log.hpp"
 #include "window/aw_window.hpp"
+#include "event/event_observer.hpp"
 namespace Airwave
 {
 
@@ -38,6 +39,8 @@ class Application
     std::chrono::steady_clock::time_point m_lastFrameTimePoint;
 
     std::unique_ptr<AwWindow> m_window;
+
+    std::shared_ptr<EventObserver> m_eventObserver;
     
     std::shared_ptr<GraphicContext> m_graphicContext;
 

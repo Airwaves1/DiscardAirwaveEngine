@@ -11,7 +11,7 @@ class WindowCloseEvent : public Event
     EVENT_CLASS_TYPE(WindowClose)
     EVENT_CLASS_GET_CATEGORY(EventCategoryApplication)
 
-    std::string ToString() const override
+    std::string toString() const override
     {
         std::stringstream a;
         a << "Window Close";
@@ -28,9 +28,9 @@ class WindowResizeEvent : public Event
     EVENT_CLASS_TYPE(WindowResized)
     EVENT_CLASS_GET_CATEGORY(EventCategoryApplication)
 
-    inline int GetWindowWidth() { return m_Width; }
-    inline int GetWindowHeight() { return m_Height; }
-    std::string ToString() const override
+    inline int getWindowWidth() const{ return m_Width; }
+    inline int getWindowHeight() const{ return m_Height; }
+    std::string toString() const override
     {
         std::stringstream a;
         a << "Window Resize: width = " << m_Width << ", height = " << m_Height;
@@ -48,7 +48,7 @@ class WindowFocusEvent : public Event
 	EVENT_CLASS_TYPE(WindowFocus)
 	EVENT_CLASS_GET_CATEGORY(EventCategoryApplication)
 
-	std::string ToString() const override
+	std::string toString() const override
 	{
 		std::stringstream a;
 		a << "Window Focus";
@@ -65,7 +65,7 @@ class WindowLostFocusEvent : public Event
 	EVENT_CLASS_TYPE(WindowLostFocus)
 	EVENT_CLASS_GET_CATEGORY(EventCategoryApplication)
 
-	std::string ToString() const override
+	std::string toString() const override
 	{
 		std::stringstream a;
 		a << "Window Lost Focus";
@@ -85,7 +85,7 @@ class WindowMoveEvent : public Event
 	inline int GetX() { return m_X; }
 	inline int GetY() { return m_Y; }
 
-	std::string ToString() const override
+	std::string toString() const override
 	{
 		std::stringstream a;
 		a << "Window Move: x = " << m_X << ", y = " << m_Y;

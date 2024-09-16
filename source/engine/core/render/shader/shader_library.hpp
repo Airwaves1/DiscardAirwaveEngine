@@ -7,9 +7,17 @@
 
 namespace Airwave
 {
+
+  #define SHADER_LIB ShaderLibrary::GetInstance() 
 class ShaderLibrary
 {
   public:
+    static ShaderLibrary &GetInstance()
+    {
+        static ShaderLibrary instance;
+        return instance;
+    }
+
     ShaderLibrary() : m_shaders() {}
     ~ShaderLibrary() = default;
 

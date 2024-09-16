@@ -23,7 +23,7 @@ class KeyEvent : public Event
 			:KeyEvent(keycode), m_KeyRepeated(keyRepeated) {}
 		inline int GetRepeated() const { return m_KeyRepeated; }
 
-		std::string ToString()const override
+		std::string toString()const override
 		{
 			std::stringstream ss;
 			ss << "KeyPressedEvent:\n KeyCode : " << m_Keycode << " KeyRepeated: " << m_KeyRepeated;
@@ -42,7 +42,7 @@ class KeyEvent : public Event
 			:KeyEvent(keycode) {}
 		EVENT_CLASS_TYPE(KeyReleased)
 
-		std::string ToString()const override
+		std::string toString()const override
 		{
 			std::stringstream ss;
 			ss << "KeyPressedEvent:\n KeyCode : " << m_Keycode;
@@ -60,7 +60,7 @@ class KeyEvent : public Event
 			:KeyEvent(keycode) {}
 		EVENT_CLASS_TYPE(KeyTyped)
 
-		std::string ToString()const override
+		std::string toString()const override
 		{
 			std::stringstream ss;
 			ss << "KeyTypedEvent:\n KeyCode : " << m_Keycode;
