@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include "geometry_utils.hpp"
 #include "render/buffer/vertex_array.hpp"
 
 namespace Airwave
@@ -33,7 +34,7 @@ class CubeGeometry : public Geometry
 {
   public:
     CubeGeometry(float width = 1.0f, float height = 1.0f, float depth = 1.0f, int widthSegments = 1,
-                 int heightSegments = 1, int depthSegments  = 1);
+                 int heightSegments = 1, int depthSegments = 1);
     ~CubeGeometry() override = default;
 
     void updateData() override;
@@ -57,6 +58,43 @@ class CubeGeometry : public Geometry
     int m_widthSegments;
     int m_heightSegments;
     int m_depthSegments;
+};
+
+class SphereGeometry : public Geometry
+{
+  public:
+    SphereGeometry(float radius = 1.0f, int widthSegments = 32, int heightSegments = 32,
+                   float phiStart = 0.0f, float phiLength = 2 * PI, float thetaStart = 0.0f,
+                   float thetaLength = PI);
+    ~SphereGeometry() override = default;
+
+    void updateData() override;
+    void draw() const override;
+
+    void setRadius(float radius)
+    {
+        m_radius = radius;
+        updateData();
+    }
+    void setSegments(int widthSegments, int heightSegments)
+    {
+        m_widthSegments  = widthSegments;
+        m_heightSegments = heightSegments;
+        updateData();
+    }
+
+    float getRadius() const { return m_radius; }
+    int getWidthSegments() const { return m_widthSegments; }
+    int getHeightSegments() const { return m_heightSegments; }
+
+  private:
+    float m_radius;
+    int m_widthSegments;
+    int m_heightSegments;
+    float m_phiStart;
+    float m_phiLength;
+    float m_thetaStart;
+    float m_thetaLength;
 };
 
 } // namespace Airwave

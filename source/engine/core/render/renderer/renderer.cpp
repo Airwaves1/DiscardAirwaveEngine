@@ -20,9 +20,12 @@ void Renderer::Submit(const std::shared_ptr<Geometry> &geo, const std::shared_pt
                       const glm::mat4 &transform)
 {
     mat->bind();
+
     mat->uploadUniform("u_viewMatrix", s_SceneData->ViewMatrix);
     mat->uploadUniform("u_projectionMatrix", s_SceneData->ProjectionMatrix);
     mat->uploadUniform("u_modelMatrix", transform);
+
+    mat->uploadUniforms();
 
     geo->draw();
 }

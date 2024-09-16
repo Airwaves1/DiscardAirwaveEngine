@@ -1,7 +1,8 @@
 #pragma once
 #include "material.hpp"
-#include "render/shader/shader_library.hpp"
 #include "utils/file_utils.hpp"
+#include "render/shader/shader_library.hpp"
+#include "render/texture/texture_2d.hpp"
 
 namespace Airwave
 {
@@ -16,6 +17,10 @@ class BasicMaterial : public Material
 
     ~BasicMaterial() = default;
 
-    virtual void bind() override { m_shader->bind(); }
+    virtual void bind() override
+    {
+        m_shader->bind();
+        setUniform("u_textureCount", static_cast<int>(m_textures.size()));
+    }
 };
 } // namespace Airwave

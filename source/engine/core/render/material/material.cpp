@@ -2,13 +2,15 @@
 #include "utils/log.hpp"
 namespace Airwave
 {
-    void Material::setTexture(const std::string &name, std::shared_ptr<Texture2D> texture)
-    {
-        m_textures[name] = texture;
-    }
 
 void Material::uploadUniforms()
 {
+    for(const auto &item : m_textures)
+    {
+        const auto &[name, texture] = item;
+        texture.first->bind(texture.second);
+        uploadUniform(name, static_cast<int>(texture.second));
+    }
     for (const auto &[name, value] : m_uniforms)
     {
         std::visit([&](auto &&arg) { uploadUniform(name, arg); }, value);

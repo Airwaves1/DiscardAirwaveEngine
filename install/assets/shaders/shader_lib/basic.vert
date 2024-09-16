@@ -14,5 +14,5 @@ void main() {
     gl_Position = u_projectionMatrix * u_viewMatrix * u_modelMatrix * vec4(a_position, 1.0);
 
     v_uv = a_uv;
-    v_normal = a_normal;
+    v_normal = (u_modelMatrix * vec4(a_normal, 1.0)).xyz;   // 将法线转换到世界空间
 }

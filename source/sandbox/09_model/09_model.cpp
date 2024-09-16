@@ -30,7 +30,6 @@ class Sandbox : public Airwave::Application
         auto texture1 = Airwave::Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
         auto texture2 = Airwave::Texture2D::Create(TEXTURE_DIR "awesomeface.png");
         m_mesh =std::make_shared<Airwave::Mesh>(std::make_shared<Airwave::CubeGeometry>(), std::make_shared<Airwave::BasicMaterial>());
-        // m_mesh =std::make_shared<Airwave::Mesh>(std::make_shared<Airwave::SphereGeometry>(0.5), std::make_shared<Airwave::BasicMaterial>());
         m_mesh->getMaterial()->setUniform("u_color", glm::vec4(0.8f, 0.5f, 0.6f, 0.3f));
         m_mesh->getMaterial()->setTexture("u_textures[0]", texture0,0);
         m_mesh->getMaterial()->setTexture("u_textures[1]", texture1,1);
@@ -56,7 +55,6 @@ class Sandbox : public Airwave::Application
                     for(int k = -5; k < 5; k++)
                     {
                         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(i*2.0f, j*2.0f, k*2.0f));
-                        m_mesh->getMaterial()->setUniform("u_color", glm::vec4( (i+5)/10.0f, (j+5)/10.0f, (k+5)/10.0f, 0.3f));
                         Airwave::Renderer::Submit(m_mesh->getGeometry(), m_mesh->getMaterial(), model);
                     }
                 }
