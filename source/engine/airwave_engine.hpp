@@ -53,9 +53,19 @@
 #include "render/object/mesh.hpp"
 #include "render/object/fullscreen_quad.hpp"
 
+
+//----------ECS----------
+#include "ecs/uuid.hpp"
+#include "ecs/aw_entity.hpp"
+#include "ecs/scene.hpp"
+#include "ecs/node.hpp"
+#include "ecs/system/forward_render_system.hpp"
+
+//----------Component----------
+#include "ecs/component/material/material_component.hpp"
+#include "ecs/component/geometry/geometry_component.hpp"
+
+
 //----------application----------
 #include "application/application.hpp"
 #include "application/entry_point.hpp"
-
-//----------geometry----------
-#include "render/geometry/geometry_utils.hpp"

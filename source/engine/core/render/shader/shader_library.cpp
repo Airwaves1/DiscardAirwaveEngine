@@ -20,7 +20,7 @@ namespace Airwave
     {
         if(exists(name))
         {
-            LOG_WARN("Shader {0} already exists", name);
+            // LOG_WARN("Shader {0} already exists", name);
             return m_shaders[name];
         }
         

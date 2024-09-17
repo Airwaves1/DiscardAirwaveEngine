@@ -64,6 +64,7 @@ include_directories(${CMAKE_SOURCE_DIR}/source/engine/platform)
 include_directories(${CMAKE_SOURCE_DIR}/source/engine/core)
 
 # 添加第三方库头文件
+include_directories(${CMAKE_SOURCE_DIR}/external)
 include_directories(${CMAKE_SOURCE_DIR}/external/glfw/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/glm)
 include_directories(${CMAKE_SOURCE_DIR}/external/spdlog)

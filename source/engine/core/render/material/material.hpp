@@ -28,6 +28,9 @@ class Material
 
     virtual void uploadUniforms();
 
+    virtual void setShader(std::shared_ptr<Shader> shader) { m_shader = shader; }
+    virtual std::shared_ptr<Shader> getShader() { return m_shader; }
+
   public:
     void uploadUniform(const std::string &name, int value);
     void uploadUniform(const std::string &name, float value);
