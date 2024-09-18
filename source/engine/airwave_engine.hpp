@@ -64,6 +64,7 @@
 //----------Component----------
 #include "ecs/component/material/material_component.hpp"
 #include "ecs/component/geometry/geometry_component.hpp"
+#include "ecs/component/light/light_component.hpp"
 
 
 //----------application----------

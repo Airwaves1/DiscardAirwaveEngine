@@ -10,7 +10,7 @@
 #include "render/light/light_manager.hpp"
 #include "ecs/component/material/material_component.hpp"
 #include "ecs/component/geometry/geometry_component.hpp"
-
+#include "ecs/component/light/light_component.hpp"
 namespace Airwave
 {
 class ForwardRenderSystem : public System
@@ -31,7 +31,6 @@ class ForwardRenderSystem : public System
             45.0f, static_cast<float>(1200) / 900, 0.1f, 100.0f);
         m_camera->setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         m_trackballController = std::make_shared<Airwave::TrackballController>(m_camera);
-
     }
     virtual ~ForwardRenderSystem() {}
 
@@ -47,10 +46,17 @@ class ForwardRenderSystem : public System
         RenderCommand::Clear();
         RenderCommand::Enable(RenderState::DepthTest);
 
-        auto view = scene->getRegistry().view<BasicMaterialComponent, GeometryComponent>();
+        auto view = scene->getRegistry().view<PhongMaterialComponent, GeometryComponent>();
+        auto lightView = scene->getRegistry().view<PointLightComponent>();
+
         view.each(
-            [&](auto entity, BasicMaterialComponent &material, GeometryComponent &geometry)
+            [&](auto entity, PhongMaterialComponent &material, GeometryComponent &geometry)
             {
+
+                lightView.each([&](auto entity, PointLightComponent &light)
+                {
+                    material.material->setUniform("u_lightColor", light.light->color);
+                });
                 material.material->setUniform("u_color", material.color);
                 Renderer::Submit(geometry.geometry, material.material, glm::mat4(1.0f));
             });
@@ -67,7 +73,6 @@ class ForwardRenderSystem : public System
     std::shared_ptr<TrackballController> m_trackballController;
     std::shared_ptr<Camera> m_camera;
     LightManager m_lightManager;
-
 };
 
 } // namespace Airwave

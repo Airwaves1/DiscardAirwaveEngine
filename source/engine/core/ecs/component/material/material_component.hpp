@@ -6,28 +6,30 @@
 
 namespace Airwave
 {
-    struct BasicMaterialComponent
+struct BasicMaterialComponent
+{
+    BasicMaterialComponent() {}
+
+    glm::vec4 color = glm::vec4(1.0f);
+    std::shared_ptr<Material> material;
+};
+
+class PhongMaterialComponent
+{
+  public:
+    PhongMaterialComponent()
     {
-        BasicMaterialComponent() {}
+        material = std::make_shared<BasicMaterial>();
+        material->setShader(SHADER_LIB.load("phong_material", SHADER_DIR "shader_lib/phong.vert",
+                                            SHADER_DIR "shader_lib/phong.frag"));
+    }
 
-        glm::vec4 color = glm::vec4(1.0f);
-        std::shared_ptr<Material> material;
+    glm::vec4 color    = glm::vec4(1.0f);
+    glm::vec3 ambient  = glm::vec3(0.1f);
+    glm::vec3 diffuse  = glm::vec3(0.5f);
+    glm::vec3 specular = glm::vec3(1.0f);
+    float shininess    = 32.0f;
+    std::shared_ptr<Material> material;
+};
 
-    };
-
-    struct PhongMaterialComponent
-    {
-        PhongMaterialComponent() {
-            material = std::make_shared<BasicMaterial>();
-            material->setShader(SHADER_LIB.load("phong_material", SHADER_DIR "shader_lib/phong.vert",
-                                                SHADER_DIR "shader_lib/phong.frag"));
-        }
-
-        glm::vec3 ambient = glm::vec3(0.1f);
-        glm::vec3 diffuse = glm::vec3(0.5f);
-        glm::vec3 specular = glm::vec3(1.0f);
-        float shininess = 32.0f;
-        std::shared_ptr<Material> material;
-    };
-    
 } // namespace Airwave

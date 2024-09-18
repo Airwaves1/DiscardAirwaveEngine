@@ -35,7 +35,7 @@ class DirectionalLight : public Light
 class PointLight : public Light
 {
   public:
-    PointLight() { type = LightType::Point; }
+    PointLight() : constant(1.0f), linear(0.09f), quadratic(0.032f) { type = LightType::Point; }
 
     glm::vec3 position;
     glm::vec3 color;
