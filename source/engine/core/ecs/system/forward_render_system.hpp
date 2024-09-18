@@ -56,8 +56,14 @@ class ForwardRenderSystem : public System
                 lightView.each([&](auto entity, PointLightComponent &light)
                 {
                     material.material->setUniform("u_lightColor", light.light->color);
+                    material.material->setUniform("u_lightPosition", light.light->position);
+                    LOG_DEBUG("light position: {0},{1},{2}", light.light->position.x, light.light->position.y,
+                              light.light->position.z);
                 });
                 material.material->setUniform("u_color", material.color);
+                material.material->setUniform("u_cameraPosition", m_camera->getPosition());
+                LOG_DEBUG("camera position: {0},{1},{2}", m_camera->getPosition().x, m_camera->getPosition().y,
+                          m_camera->getPosition().z);
                 Renderer::Submit(geometry.geometry, material.material, glm::mat4(1.0f));
             });
 

@@ -26,7 +26,7 @@ class Sandbox : public Airwave::Application
         auto &pointLight = pointLightEntity->addComponent<Airwave::PointLightComponent>();
         pointLight.light->color = glm::vec3(1.0f, 1.0f, 1.0f);
         pointLight.light->intensity = glm::vec3(1.0f, 1.0f, 1.0f);
-        pointLight.light->position = glm::vec3(3.0f, 3.0f, 3.0f);
+        pointLight.light->position = glm::vec3(3.0f, 0.0f, 0.0f);
 
         // 添加渲染系统
         auto forwardRenderSystem = std::make_shared<Airwave::ForwardRenderSystem>();
