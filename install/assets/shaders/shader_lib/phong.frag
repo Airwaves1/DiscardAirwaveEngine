@@ -1,58 +1,99 @@
 #version 460
 
+#define USE_DIFFUSE_MAP
+#define USE_SPECULAR_MAP
+#define USE_NORMAL_MAP
+
 layout(location = 0) out vec4 o_fragColor;
 
 layout(location = 0) in vec3 v_normal;
 layout(location = 1) in vec2 v_uv;
 layout(location = 2) in vec3 v_worldPosition;
 
-uniform vec4 u_color;         // 基础颜色
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+
+    sampler2D diffuseMap;
+    sampler2D specularMap;
+    sampler2D normalMap;
+};
+
+struct Light {
+    int type;   // 0: point light, 1: directional light, 2: spot light
+    vec3 position;
+    vec3 direction;
+    float intensity;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+uniform Material u_material;
+uniform Light u_lights[16];    // 最多支持 16 个光源
+uniform int u_lightCount;       // 光源数量
 
 uniform vec3 u_cameraPosition;  // 相机位置
 
-uniform sampler2D u_textures[16];   // 最多支持16个纹理
-uniform float u_blendFactors[16];   // 混合因子
-uniform int u_textureCount;         // 纹理数量
-
-uniform vec3 u_lightColor;      // 光源颜色
-uniform vec3 u_lightPosition;   // 光源位置
-
-
+vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light);
 
 void main() {
-    vec4 finalColor = vec4(0.0);
+    vec4 finalColor = vec4(vec3(0.), 1.0);
 
-    vec3 blendedColor = vec3(0.0);  // 初始化混合颜色为黑色
-
-    // 根据纹理数量计算颜色
-    for(int i = 0; i < u_textureCount; i++) {
-        blendedColor += texture(u_textures[i], v_uv).rgb * u_blendFactors[i];
+    for(int i = 0; i < u_lightCount; i++) {
+        if(u_lights[i].type == 0) {
+            finalColor.rgb += CalPointLight(v_normal, v_worldPosition, u_cameraPosition, u_lights[i]);
+        }
     }
-
-    // 混合基础颜色（alpha 通道用于控制基础颜色的影响）
-    blendedColor = mix(blendedColor, u_color.rgb, u_color.a);
-
-    // 计算光照
-    // 环境光
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * u_lightColor;
-
-    // 漫反射光
-    vec3 norm = normalize(v_normal);
-    vec3 lightDir = normalize(v_worldPosition - u_lightPosition);
-    float diff = max(dot(norm, -lightDir), 0.0);
-    vec3 diffuse = diff * u_lightColor;
-
-    // 镜面光
-    float specularStrength = 0.5;
-    vec3 viewDir = normalize(v_worldPosition - u_cameraPosition);
-    vec3 halfwayDir = normalize((-lightDir) + (-viewDir));
-    float spec = pow(max(dot(norm, halfwayDir), 0.0), 128.0);
-    vec3 specular = specularStrength * spec * u_lightColor;
-
-    vec3 result = ambient + diffuse + specular;
-    finalColor = vec4(result * blendedColor, u_color.a);
 
     // 输出最终颜色，alpha 值为基础颜色的 alpha
     o_fragColor = finalColor;
+}
+
+vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {
+    vec3 f = vec3(0.0);
+
+    // 漫反射
+    normal = normalize(normal);
+    
+    vec3 lightDir = normalize(worldPosition - light.position);
+    
+    float diff = max(dot(normal, -lightDir), 0.0);
+
+    vec3 viewDir = normalize(worldPosition - cameraPosition);
+    
+    vec3 halfDir = normalize(-lightDir - viewDir);
+
+    float flag = step(0.0, dot(-lightDir, normal));  // 解决背面光照问题
+
+#ifdef USE_DIFFUSE_MAP
+
+    vec3 diffuseColor = texture(u_material.diffuseMap, v_uv).rgb;
+    vec3 specularColor = texture(u_material.specularMap, v_uv).rgb;
+
+    vec3 ambient = light.ambient * diffuseColor;
+
+    vec3 diffuse = light.diffuse * diff * diffuseColor;
+
+
+    float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
+
+    vec3 specular = (light.specular * spec) * specularColor;
+
+#else
+
+    vec3 ambient = light.ambient * u_material.ambient;
+
+    vec3 diffuse = (light.diffuse * diff) * u_material.diffuse;
+
+    float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
+    vec3 specular = (light.specular * spec) * u_material.specular;
+
+
+#endif
+    f = ambient + diffuse + specular;
+    return f;
 }

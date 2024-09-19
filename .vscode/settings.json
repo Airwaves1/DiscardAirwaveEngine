@@ -82,7 +82,8 @@
         "set": "cpp",
         "unordered_set": "cpp",
         "codecvt": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "typeindex": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:\\Develop\\Tools\\clang+llvm-18.1.8-x86_64-pc-windows-msvc\\clang+llvm-18.1.8-x86_64-pc-windows-msvc\\bin\\clang++.exe",
     "C_Cpp.errorSquiggles": "enabled"

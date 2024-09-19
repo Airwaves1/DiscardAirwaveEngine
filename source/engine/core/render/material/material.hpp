@@ -11,14 +11,20 @@ using UniformValue = std::variant<int, float, glm::vec2, glm::vec3, glm::vec4, g
 class Material
 {
   public:
-    Material() = default;
+    Material() {}
 
-    virtual void bind() = 0;
+    virtual void bind()
+    {
+        m_shader->bind();
+
+        if(m_textures.empty()) return;
+        // setUniform("u_textureCount", static_cast<int>(m_textures.size()));
+    }
 
     void setTexture(const std::string &name, std::shared_ptr<Texture2D> texture, uint32_t slot)
     {
         m_textures[name] = std::make_pair(texture, slot);
-        setUniform("u_textureCount", static_cast<int>(m_textures.size()));
+        // setUniform("u_textureCount", static_cast<int>(m_textures.size()));
     }
 
     template <typename T> void setUniform(const std::string &name, const T &value)

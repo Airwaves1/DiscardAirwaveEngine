@@ -11,6 +11,7 @@
 #include "ecs/component/material/material_component.hpp"
 #include "ecs/component/geometry/geometry_component.hpp"
 #include "ecs/component/light/light_component.hpp"
+#include "ecs/system/light_system.hpp"
 namespace Airwave
 {
 class ForwardRenderSystem : public System
@@ -46,24 +47,32 @@ class ForwardRenderSystem : public System
         RenderCommand::Clear();
         RenderCommand::Enable(RenderState::DepthTest);
 
-        auto view = scene->getRegistry().view<PhongMaterialComponent, GeometryComponent>();
-        auto lightView = scene->getRegistry().view<PointLightComponent>();
+        if (!scene->hasSystem<LightSystem>())
+        {
+            m_lightSystem = std::make_shared<LightSystem>();
+            scene->addSystem(m_lightSystem);
+        }else{
+            m_lightSystem = scene->getSystem<LightSystem>();
+        }
+
+        m_lightSystem->updateLights(scene->getRegistry());
+
+        auto view      = scene->getRegistry().view<PhongMaterialComponent, GeometryComponent>();
+        // auto lightView = scene->getRegistry().view<LightComponent>();
 
         view.each(
             [&](auto entity, PhongMaterialComponent &material, GeometryComponent &geometry)
             {
+                // 上传光照信息到材质
+                m_lightSystem->applyLightsToMaterial(material.material);
 
-                lightView.each([&](auto entity, PointLightComponent &light)
-                {
-                    material.material->setUniform("u_lightColor", light.light->color);
-                    material.material->setUniform("u_lightPosition", light.light->position);
-                    LOG_DEBUG("light position: {0},{1},{2}", light.light->position.x, light.light->position.y,
-                              light.light->position.z);
-                });
-                material.material->setUniform("u_color", material.color);
+                // material.material->setUniform("u_material.ambient", material.ambient);
+                // material.material->setUniform("u_material.diffuse", material.diffuse);
+                // material.material->setUniform("u_material.specular", material.specular);
+                material.material->setUniform("u_material.shininess", material.shininess);
+                material.material->setTexture("u_material.diffuseMap", material.diffuseMap, 0);
+                material.material->setTexture("u_material.specularMap", material.specularMap, 1);
                 material.material->setUniform("u_cameraPosition", m_camera->getPosition());
-                LOG_DEBUG("camera position: {0},{1},{2}", m_camera->getPosition().x, m_camera->getPosition().y,
-                          m_camera->getPosition().z);
                 Renderer::Submit(geometry.geometry, material.material, glm::mat4(1.0f));
             });
 
@@ -78,7 +87,17 @@ class ForwardRenderSystem : public System
     std::shared_ptr<FullScreenQuad> m_fullScreenQuad;
     std::shared_ptr<TrackballController> m_trackballController;
     std::shared_ptr<Camera> m_camera;
-    LightManager m_lightManager;
+
+    std::shared_ptr<LightSystem> m_lightSystem;
 };
 
 } // namespace Airwave
+
+// lightView.each([&](auto entity, PointLightComponent &light)
+// {
+//     material.material->setUniform("u_lightColor", light.light->color);
+//     material.material->setUniform("u_lightPosition", light.light->position);
+//     LOG_DEBUG("light position: {0},{1},{2}", light.light->position.x,
+//     light.light->position.y,
+//               light.light->position.z);
+// });

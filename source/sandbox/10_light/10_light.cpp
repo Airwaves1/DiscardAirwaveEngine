@@ -12,21 +12,28 @@ class Sandbox : public Airwave::Application
         // 创建场景
         m_scene     = std::make_shared<Airwave::Scene>("sandbox");
 
-
-
         // 添加场景渲染实体
         auto entity = m_scene->createAwEntity("phong cube");
         auto &phongMaterial = entity->addComponent<Airwave::PhongMaterialComponent>();
-        phongMaterial.color = glm::vec4(0.8f, 0.4f, 0.3f, 1.0f);
+        phongMaterial.ambient = glm::vec3(1.0f, 0.5f, 0.31f);
+        phongMaterial.diffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+        phongMaterial.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+        phongMaterial.shininess = 32.0f;
+        phongMaterial.diffuseMap = Airwave::Texture2D::Create(TEXTURE_DIR "container2.png");
+        phongMaterial.specularMap = Airwave::Texture2D::Create(TEXTURE_DIR "container2_specular.png");
+        
         auto &geometry    = entity->addComponent<Airwave::GeometryComponent>();
         geometry.geometry = std::make_shared<Airwave::CubeGeometry>();
 
         // 添加光源
-        auto pointLightEntity = m_scene->createAwEntity("point light");
-        auto &pointLight = pointLightEntity->addComponent<Airwave::PointLightComponent>();
-        pointLight.light->color = glm::vec3(1.0f, 1.0f, 1.0f);
-        pointLight.light->intensity = glm::vec3(1.0f, 1.0f, 1.0f);
-        pointLight.light->position = glm::vec3(3.0f, 0.0f, 0.0f);
+        auto lightEntity_0 = m_scene->createAwEntity("light_0");
+        auto &pointLight = lightEntity_0->addComponent<Airwave::LightComponent>();
+        pointLight.type = Airwave::LightType::Point;
+        pointLight.intensity = 1.0f;
+        pointLight.position = glm::vec3(3.0f, 0.0f, 3.0f);
+        pointLight.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+        pointLight.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+        pointLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
         // 添加渲染系统
         auto forwardRenderSystem = std::make_shared<Airwave::ForwardRenderSystem>();

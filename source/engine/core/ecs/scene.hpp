@@ -4,7 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-
+#include <typeindex>
 /**
  *  Scene类用于管理一个场景，包含ECS系统中的所有实体和组件。它是实体管理的中心节点。
  *  功能:
@@ -36,6 +36,26 @@ class Scene : public std::enable_shared_from_this<Scene>
     void addSystem(const std::shared_ptr<System> &system);
     void removeSystem(const std::shared_ptr<System> &system);
     void updateSystems(float deltaTime);
+    
+    // 查看是否有某个系统
+    template <typename T>
+    bool hasSystem() const
+    {
+        const std::type_index typeIndex = std::type_index(typeid(T));
+        return m_systems.find(typeIndex) != m_systems.end();
+    }
+
+    // 获取系统
+    template <typename T>
+    std::shared_ptr<T> getSystem()
+    {
+        const std::type_index typeIndex = std::type_index(typeid(T));
+        if (m_systems.find(typeIndex) != m_systems.end())
+        {
+            return std::static_pointer_cast<T>(m_systems[typeIndex]);
+        }
+        return nullptr;
+    }
 
     entt::registry &getRegistry() { return m_registry; } // ECS注册表
     std::shared_ptr<Node> getRootNode() const { return m_rootNode; }
@@ -48,7 +68,7 @@ class Scene : public std::enable_shared_from_this<Scene>
     entt::registry m_registry; // ECS注册表
 
     std::unordered_map<entt::entity, std::shared_ptr<AwEntity>> m_awEntityMap; // 实体映射
-    std::unordered_set<std::shared_ptr<System>> m_systems;                   // 系统集合
+    std::unordered_map<std::type_index, std::shared_ptr<System>> m_systems; // 系统集合
     std::shared_ptr<Node> m_rootNode;                                            // 根节点
 
     friend class AwEntity;

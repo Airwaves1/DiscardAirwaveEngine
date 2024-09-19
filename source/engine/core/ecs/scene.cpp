@@ -68,15 +68,31 @@ void Scene::destroyAllAwEntities()
     m_awEntityMap.clear();
 }
 
-void Scene::addSystem(const std::shared_ptr<System> &system) { m_systems.insert(system); }
+void Scene::addSystem(const std::shared_ptr<System> &system)
+{
+    if (system)
+    {
+        auto &systemRef = *system;
+        std::type_index typeIndex = std::type_index(typeid(systemRef));
+        m_systems[typeIndex]      = system;
+    }
+}
 
-void Scene::removeSystem(const std::shared_ptr<System> &system) { m_systems.erase(system); }
+void Scene::removeSystem(const std::shared_ptr<System> &system)
+{
+    if (system)
+    {
+        auto &systemRef = *system;
+        std::type_index typeIndex = std::type_index(typeid(systemRef));
+        m_systems.erase(typeIndex);
+    }
+}
 
 void Scene::updateSystems(float deltaTime)
 {
     for (const auto &system : m_systems)
     {
-        system->update(shared_from_this(), deltaTime);
+        system.second->update(shared_from_this(), deltaTime);
     }
 }
 

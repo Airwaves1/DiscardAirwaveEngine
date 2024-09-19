@@ -11,8 +11,8 @@ class BasicMaterial : public Material
   public:
     BasicMaterial()
     {
-        m_shader = SHADER_LIB.load("basic_material", SHADER_DIR "shader_lib/basic.vert",
-                                   SHADER_DIR "shader_lib/basic.frag");
+        // m_shader = SHADER_LIB.load("basic_material", SHADER_DIR "shader_lib/basic.vert",
+        //                            SHADER_DIR "shader_lib/basic.frag");
     }
 
     ~BasicMaterial() = default;
