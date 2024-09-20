@@ -73,7 +73,28 @@ class ForwardRenderSystem : public System
                 material.material->setTexture("u_material.diffuseMap", material.diffuseMap, 0);
                 material.material->setTexture("u_material.specularMap", material.specularMap, 1);
                 material.material->setUniform("u_cameraPosition", m_camera->getPosition());
-                Renderer::Submit(geometry.geometry, material.material, glm::mat4(1.0f));
+
+                for(int i = 0; i < 10; i++)
+                {
+                    glm::mat4 model = glm::mat4(1.0f);
+                    model = glm::translate(model, m_positions[i]);
+                    model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+
+
+                    Renderer::Submit(geometry.geometry, material.material, model);
+                }
+                // Renderer::Submit(geometry.geometry, material.material, glm::mat4(1.0f));
+            });
+
+        auto basicView = scene->getRegistry().view<BasicMaterialComponent, GeometryComponent>();
+        basicView.each(
+            [&](auto entity, BasicMaterialComponent &material, GeometryComponent &geometry)
+            {
+                material.material->setUniform("u_color", material.color);
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, glm::vec3(0.0f, 2.0f, 3.0f));
+                model = glm::scale(model, glm::vec3(0.1f));
+                Renderer::Submit(geometry.geometry, material.material, model);
             });
 
         Renderer::EndScene();
@@ -89,6 +110,20 @@ class ForwardRenderSystem : public System
     std::shared_ptr<Camera> m_camera;
 
     std::shared_ptr<LightSystem> m_lightSystem;
+
+
+    std::vector<glm::vec3> m_positions = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -1.5f),
+    };
 };
 
 } // namespace Airwave

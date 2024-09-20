@@ -30,6 +30,14 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
+
+    float cutOff;
+    float outerCutOff;
+
 };
 
 uniform Material u_material;
@@ -39,13 +47,25 @@ uniform int u_lightCount;       // 光源数量
 uniform vec3 u_cameraPosition;  // 相机位置
 
 vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light);
+vec3 CalDirectionalLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light);
+vec3 CalSpotLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light);
 
 void main() {
     vec4 finalColor = vec4(vec3(0.), 1.0);
 
+    vec3 normal = normalize(v_normal);
+    vec3 worldPosition = v_worldPosition;
+    vec3 cameraPosition = u_cameraPosition;
+
     for(int i = 0; i < u_lightCount; i++) {
         if(u_lights[i].type == 0) {
-            finalColor.rgb += CalPointLight(v_normal, v_worldPosition, u_cameraPosition, u_lights[i]);
+            finalColor.rgb += CalPointLight(normal, worldPosition, cameraPosition, u_lights[i]);
+        }
+        if(u_lights[i].type == 1) {
+            finalColor.rgb += CalDirectionalLight(normal, worldPosition, cameraPosition, u_lights[i]);
+        }
+        if(u_lights[i].type == 2) {
+            finalColor.rgb += CalSpotLight(normal, worldPosition, cameraPosition, u_lights[i]);
         }
     }
 
@@ -56,15 +76,57 @@ void main() {
 vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {
     vec3 f = vec3(0.0);
 
-    // 漫反射
-    normal = normalize(normal);
-    
     vec3 lightDir = normalize(worldPosition - light.position);
-    
+
     float diff = max(dot(normal, -lightDir), 0.0);
 
     vec3 viewDir = normalize(worldPosition - cameraPosition);
-    
+
+    vec3 halfDir = normalize(-lightDir - viewDir);
+
+    float flag = step(0.0, dot(-lightDir, normal));  // 解决背面光照问题
+
+    float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
+
+    float distance = length(worldPosition - light.position);
+
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
+
+#ifdef USE_DIFFUSE_MAP
+
+    vec3 diffuseColor = texture(u_material.diffuseMap, v_uv).rgb;
+
+    vec3 specularColor = texture(u_material.specularMap, v_uv).rgb;
+
+    vec3 ambient = light.ambient * diffuseColor * attenuation;
+
+    vec3 diffuse = light.diffuse * diff * diffuseColor * attenuation;
+
+    vec3 specular = (light.specular * spec) * specularColor * attenuation;
+
+#else
+
+    vec3 ambient = light.ambient * u_material.ambient;
+
+    vec3 diffuse = (light.diffuse * diff) * u_material.diffuse;
+
+    vec3 specular = (light.specular * spec) * u_material.specular;
+
+#endif
+    f = ambient + diffuse + specular;
+    return f;
+}
+
+vec3 CalDirectionalLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {
+
+    vec3 f = vec3(0.0);
+
+    vec3 lightDir = normalize(light.direction);
+
+    float diff = max(dot(normal, -lightDir), 0.0);
+
+    vec3 viewDir = normalize(worldPosition - cameraPosition);
+
     vec3 halfDir = normalize(-lightDir - viewDir);
 
     float flag = step(0.0, dot(-lightDir, normal));  // 解决背面光照问题
@@ -77,7 +139,6 @@ vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light l
     vec3 ambient = light.ambient * diffuseColor;
 
     vec3 diffuse = light.diffuse * diff * diffuseColor;
-
 
     float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
 
@@ -92,8 +153,64 @@ vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light l
     float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
     vec3 specular = (light.specular * spec) * u_material.specular;
 
+#endif  
+
+    f = ambient + diffuse + specular;
+    return f;
+}
+
+vec3 CalSpotLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {
+    vec3 f = vec3(0.0);
+
+    vec3 lightDir = normalize(light.position - worldPosition);
+
+    float diff = max(dot(normal, -lightDir), 0.0);
+
+    vec3 viewDir = normalize(worldPosition - cameraPosition);
+
+    vec3 halfDir = normalize(-lightDir - viewDir);
+
+    float flag = step(0.0, dot(-lightDir, normal));  // 解决背面光照问题
+
+    float spec = pow(max(dot(normal, halfDir), 0.0), u_material.shininess) * flag;
+
+    float distance = length(worldPosition - light.position);
+
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
+
+    float theta = dot(lightDir, normalize(-light.direction));
+
+    if(theta < light.cutOff) {
+
+        // float epsilon = light.cutOff - light.outerCutOff;
+
+        // float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+#ifdef USE_DIFFUSE_MAP
+
+        vec3 diffuseColor = texture(u_material.diffuseMap, v_uv).rgb;
+
+        vec3 specularColor = texture(u_material.specularMap, v_uv).rgb;
+
+        vec3 ambient = light.ambient * diffuseColor;
+
+        vec3 diffuse = light.diffuse * diff * diffuseColor * attenuation;
+
+        vec3 specular = (light.specular * spec) * specularColor * attenuation;
+
+#else
+
+        vec3 ambient = light.ambient * u_material.ambient;
+
+        vec3 diffuse = (light.diffuse * diff) * u_material.diffuse;
+
+        vec3 specular = (light.specular * spec) * u_material.specular;  
 
 #endif
-    f = ambient + diffuse + specular;
+
+        f = ambient + diffuse + specular;
+    } else {
+        f = vec3(light.ambient * texture(u_material.diffuseMap, v_uv).rgb);
+    }
     return f;
 }

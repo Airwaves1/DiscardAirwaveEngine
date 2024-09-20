@@ -8,7 +8,11 @@ namespace Airwave
 {
 struct BasicMaterialComponent
 {
-    BasicMaterialComponent() {}
+    BasicMaterialComponent() {
+        material = std::make_shared<Material>();
+        material->setShader(SHADER_LIB.load("basic_material", SHADER_DIR "shader_lib/basic.vert",
+                                            SHADER_DIR "shader_lib/basic.frag"));
+    }
 
     glm::vec4 color = glm::vec4(1.0f);
     std::shared_ptr<Material> material;

@@ -42,11 +42,26 @@ class LightSystem : public System
         {
             const auto &light = m_lights[i];
             material->setUniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(light.type));
-            material->setUniform("u_lights[" + std::to_string(i) + "].position", light.position);
             material->setUniform("u_lights[" + std::to_string(i) + "].intensity", light.intensity);
             material->setUniform("u_lights[" + std::to_string(i) + "].ambient", light.ambient);
             material->setUniform("u_lights[" + std::to_string(i) + "].diffuse", light.diffuse);
             material->setUniform("u_lights[" + std::to_string(i) + "].specular", light.specular);
+            if(light.type == LightType::Point){
+                material->setUniform("u_lights[" + std::to_string(i) + "].position", light.position);
+                material->setUniform("u_lights[" + std::to_string(i) + "].constant", light.constant);
+                material->setUniform("u_lights[" + std::to_string(i) + "].linear", light.linear);
+                material->setUniform("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
+            }else if(light.type == LightType::Directional){
+                material->setUniform("u_lights[" + std::to_string(i) + "].direction", light.direction);
+            }else if(light.type == LightType::Spot){
+                material->setUniform("u_lights[" + std::to_string(i) + "].position", light.position);
+                material->setUniform("u_lights[" + std::to_string(i) + "].direction", light.direction);
+                material->setUniform("u_lights[" + std::to_string(i) + "].constant", light.constant);
+                material->setUniform("u_lights[" + std::to_string(i) + "].linear", light.linear);
+                material->setUniform("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
+                material->setUniform("u_lights[" + std::to_string(i) + "].cutOff", light.cutOff);
+                material->setUniform("u_lights[" + std::to_string(i) + "].outerCutOff", light.outerCutOff);
+            }
         }
     }
 
