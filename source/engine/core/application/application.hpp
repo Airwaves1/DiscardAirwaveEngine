@@ -32,6 +32,8 @@ class Application
 
     const std::unique_ptr<AwWindow> &getWindow() const { return m_window; }
 
+    void handleEvent();
+
   protected:
     virtual void onConfiguration(ApplicationSettings &settings) {}
     virtual void onInit() {}
@@ -39,6 +41,8 @@ class Application
     virtual void onRender() {}
     virtual void onDstroy() {}
     virtual void onImGuiRender() {}
+    virtual void onEvent(Event &event) {}
+    
 
 
     std::chrono::steady_clock::time_point m_startTimePoint;

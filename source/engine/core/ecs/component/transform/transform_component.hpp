@@ -1,8 +1,9 @@
 #pragma once
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "ecs/aw_component.hpp"
+#include "ecs/aw_entity.hpp"
 
 namespace Airwave
 {
@@ -51,10 +52,24 @@ struct TransformComponent
         m_dirty = true;
     }
 
+    
+    // 设置父变换组件
+    void setParent(std::shared_ptr<AwEntity> parent)
+    {
+        m_transform_parent = parent;
+    }
+    
+    std::shared_ptr<AwEntity> getParent() const
+    {
+        return m_transform_parent;
+    }
+
     // 获取位置、旋转、缩放
     const glm::vec3 &getPosition() const { return m_position; }
     const glm::quat &getRotation() const { return m_rotation; }
     const glm::vec3 &getScale() const { return m_scale; }
+
+    friend class TransformSystem;
 
   private:
     glm::vec3 m_position; // 位置
@@ -63,6 +78,8 @@ struct TransformComponent
 
     bool m_dirty;                // 标记是否需要更新矩阵
     glm::mat4 m_transformMatrix; // 缓存的变换矩阵
+
+    std::shared_ptr<AwEntity> m_transform_parent; // 父变换组件
 
     // 计算变换矩阵
     glm::mat4 calculateTransformMatrix() const

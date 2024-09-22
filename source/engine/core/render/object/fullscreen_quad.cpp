@@ -82,6 +82,10 @@ void FullScreenQuad::render(const std::shared_ptr<Framebuffer> &framebuffer)
                 m_resolveFramebuffer =
                     Framebuffer::Create(framebuffer->getWidth(), framebuffer->getHeight(), spec);
             }
+            if(m_resolveFramebuffer->getWidth() != framebuffer->getWidth() || m_resolveFramebuffer->getHeight() != framebuffer->getHeight())
+            {
+                m_resolveFramebuffer->resize(framebuffer->getWidth(), framebuffer->getHeight());
+            }
 
             framebuffer->resolve(m_resolveFramebuffer->getFramebufferID());
             m_shader->bind();

@@ -84,6 +84,19 @@ class AwEntity : public Node
         }
     }
 
+    template <typename T> T &getRefComponent()
+    {
+        if (hasComponent<T>())
+        {
+            return m_scene->m_registry.get<T>(m_entity);
+        }
+        else
+        {
+            LOG_ERROR("Entity does not have this component.");
+            throw std::runtime_error("Component not found"); // 或者返回一个默认值
+        }
+    }
+
     // 获取所有组件的数组
     template <typename T> std::vector<std::shared_ptr<T>> getAllComponents()
     {

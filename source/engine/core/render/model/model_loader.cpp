@@ -3,6 +3,7 @@
 #include "utils/file_utils.hpp"
 #include "tiny_gltf/tiny_gltf.h"
 #include "ecs/aw_entity.hpp"
+#include "ecs/component/transform/transform_component.hpp"
 namespace Airwave
 {
 int ModelLoader::load(const std::string &path, const std::shared_ptr<AwEntity> &modelEntity,
@@ -87,6 +88,9 @@ int ModelLoader::load(const std::string &path, const std::shared_ptr<AwEntity> &
             // 为每个 shape 创建 mesh 实体
             auto meshEntity = modelEntity->getScene()->createAwEntity(modelEntity->getName() + "_mesh_" + shape.name);
             meshEntity->setParent(modelEntity);
+            auto transformComponent = meshEntity->addComponent<TransformComponent>();
+            transformComponent->setParent(modelEntity);
+
             auto meshComponent               = meshEntity->addComponent<MeshComponent>();
             meshComponent->name              = shape.name;
             meshComponent->geometryComponent = geometryComponent;

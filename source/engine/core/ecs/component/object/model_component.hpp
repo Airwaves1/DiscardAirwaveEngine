@@ -15,6 +15,9 @@ struct ModelComponent
     {
         auto modelEntity = entity->getScene()->createAwEntity(entity->getName() + "_model");
         modelEntity->setParent(entity);
+        auto transformComponent = modelEntity->addComponent<TransformComponent>();
+        transformComponent->setParent(entity);
+        
         ModelLoader modelLoader;
         int ret = modelLoader.load(path, modelEntity, meshComponents);
 

@@ -28,18 +28,8 @@ void Application::start(int argc, char **argv)
     // 初始化
     onInit();
 
-    // 设置基本的事件
-    m_eventObserver = std::make_shared<EventObserver>();
-    m_eventObserver->onEvent<WindowResizeEvent>(
-        [this](const WindowResizeEvent &event)
-        {
-            m_settings.width  = static_cast<uint32_t>(event.getWindowWidth());
-            m_settings.height = static_cast<uint32_t>(event.getWindowHeight());
-
-            LOG_DEBUG("WindowResizeEvent: width = {0}, height = {1}", m_settings.width,
-                      m_settings.height);
-            RenderCommand::OnViewportResize(2560, 1369);
-        });
+    // 事件处理
+    handleEvent();
 
     m_startTimePoint = std::chrono::steady_clock::now();
 
@@ -49,7 +39,7 @@ void Application::start(int argc, char **argv)
     ImGui::CreateContext();
 
     // 配置 ImGui 样式
-    ImGui::StyleColorsDark(); // 你也可以使用 Light 主题：ImGui::StyleColorsLight();
+    ImGui::StyleColorsLight(); // 你也可以使用 Light 主题：ImGui::StyleColorsLight();
 
     // 初始化 ImGui 的 GLFW 平台/窗口绑定
     ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(m_window->getNativeWindow()), true);
@@ -72,9 +62,7 @@ void Application::mainLoop()
     {
         m_window->pollEvents();
 
-        float deltaTime =
-            std::chrono::duration<float>(std::chrono::steady_clock::now() - m_lastFrameTimePoint)
-                .count();
+        float deltaTime = std::chrono::duration<float>(std::chrono::steady_clock::now() - m_lastFrameTimePoint).count();
         m_lastFrameTimePoint = std::chrono::steady_clock::now();
         m_frameIndex++;
 
@@ -96,6 +84,25 @@ void Application::mainLoop()
 
         m_window->swapBuffers();
     }
+}
+
+void Application::handleEvent()
+{
+    if (!m_eventObserver)
+    {
+        m_eventObserver = std::make_shared<EventObserver>();
+    }
+
+    m_eventObserver->onEvent<WindowResizeEvent>(
+        [this](const WindowResizeEvent &event)
+        {
+            m_settings.width  = static_cast<uint32_t>(event.getWindowWidth());
+            m_settings.height = static_cast<uint32_t>(event.getWindowHeight());
+
+            RenderCommand::OnViewportResize(m_settings.width, m_settings.height);
+        });
+
+    m_eventObserver->onEvent<WindowCloseEvent>([this](const WindowCloseEvent &event) { this->b_pause = true; });
 }
 
 void Application::parseArguments(int argc, char **argv) {}

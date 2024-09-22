@@ -17,6 +17,8 @@
 #include "ecs/system/light_system.hpp"
 #include "ecs/system/material_system.hpp"
 #include "ecs/component/object/mesh_component.hpp"
+#include "ecs/system/transform_system.hpp"
+#include "event/event_observer.hpp"
 namespace Airwave
 {
 class ForwardRenderSystem : public System
@@ -31,6 +33,12 @@ class ForwardRenderSystem : public System
         spec.enableMSAA = true;
         spec.samples    = 4;
         m_framebuffer   = Airwave::Framebuffer::Create(1200, 900, spec);
+
+        m_eventObserver = std::make_shared<EventObserver>();
+        m_eventObserver->onEvent<WindowResizeEvent>([this](const WindowResizeEvent &e)
+                                                    { 
+                                                        LOG_DEBUG("WindowResizeEvent: {0},{1}", e.getWindowWidth(), e.getWindowHeight());
+                                                        m_framebuffer->resize(e.getWindowWidth(), e.getWindowHeight()); });
 
         m_materialSystem = std::make_shared<MaterialSystem>();
     }
@@ -55,6 +63,17 @@ class ForwardRenderSystem : public System
         auto entity           = *cameraView.begin();
         auto &cameraComponent = cameraView.get<CameraComponent>(entity);
 
+        // ########################## 2. 变换组件系统 ##########################
+        if (!scene->hasSystem<TransformSystem>())
+        {
+            m_transformSystem = std::make_shared<TransformSystem>();
+            scene->addSystem(m_transformSystem);
+        }
+        else
+        {
+            m_transformSystem = scene->getSystem<TransformSystem>();
+        }
+
         // ########################## 2. 设置渲染目标 ##########################
         m_framebuffer->bind();
         RenderCommand::SetClearColor({0.2f, 0.2f, 0.2f, 1.0f});
@@ -74,11 +93,10 @@ class ForwardRenderSystem : public System
 
         m_lightSystem->updateLights(scene->getRegistry());
 
-
         // 处理网格组件
-        auto meshView = scene->getRegistry().view<MeshComponent>();
+        auto meshView = scene->getRegistry().view<MeshComponent, TransformComponent>();
         meshView.each(
-            [&](auto entity, MeshComponent &mesh)
+            [&](auto entity, MeshComponent &mesh, TransformComponent &transform)
             {
                 // 检查几何体组件是否有效，提前返回避免无效绘制
                 if (mesh.geometryComponent == nullptr)
@@ -95,15 +113,14 @@ class ForwardRenderSystem : public System
                 }
 
                 // 获取或创建变换组件
-                auto transformComponent = scene->getRegistry().try_get<TransformComponent>(entity);
-                if (transformComponent == nullptr)
-                {
-                    transformComponent = &scene->getRegistry().emplace<TransformComponent>(entity); // 取地址
-                }
+                // auto transformComponent = scene->getRegistry().try_get<TransformComponent>(entity);
+                // if (transformComponent == nullptr)
+                // {
+                //     transformComponent = &scene->getRegistry().emplace<TransformComponent>(entity); // 取地址
+                // }
 
                 // 更新材质信息
-                m_materialSystem->updateMaterial(mesh.materialComponent, cameraComponent, *transformComponent,
-                                                 deltaTime);
+                m_materialSystem->updateMaterial(mesh.materialComponent, cameraComponent, transform, deltaTime);
 
                 // 应用光照到材质
                 m_lightSystem->applyLightsToMaterial(mesh.materialComponent);
@@ -126,6 +143,9 @@ class ForwardRenderSystem : public System
 
     std::shared_ptr<LightSystem> m_lightSystem;
     std::shared_ptr<MaterialSystem> m_materialSystem;
+    std::shared_ptr<TransformSystem> m_transformSystem;
+
+    std::shared_ptr<EventObserver> m_eventObserver;
 };
 
 } // namespace Airwave
