@@ -17,7 +17,7 @@ class Material
     {
         m_shader->bind();
 
-        if(m_textures.empty()) return;
+        if (m_textures.empty()) return;
         // setUniform("u_textureCount", static_cast<int>(m_textures.size()));
     }
 

@@ -7,6 +7,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#define UNIFORM_DEBUG 1
+
 namespace Airwave
 {
 
@@ -45,7 +47,7 @@ OpenGLShader::~OpenGLShader() { glDeleteProgram(m_rendererID); }
 
 void OpenGLShader::compile()
 {
-    if(m_rendererID != -1)
+    if (m_rendererID != -1)
     {
         glDeleteProgram(m_rendererID);
     }
@@ -126,8 +128,8 @@ void OpenGLShader::compile()
 
 void OpenGLShader::addMacro(const std::string macroNanme, const std::string &macroValue)
 {
-    std::string define = "#define " + macroNanme + " " + macroValue + "\n";
-    m_openGLSourceCode[ShaderType::Vertex] = define + m_openGLSourceCode[ShaderType::Vertex];
+    std::string define                       = "#define " + macroNanme + " " + macroValue + "\n";
+    m_openGLSourceCode[ShaderType::Vertex]   = define + m_openGLSourceCode[ShaderType::Vertex];
     m_openGLSourceCode[ShaderType::Fragment] = define + m_openGLSourceCode[ShaderType::Fragment];
     compile();
 }
@@ -136,8 +138,7 @@ void OpenGLShader::bind() const { glUseProgram(m_rendererID); }
 
 void OpenGLShader::unbind() const { glUseProgram(0); }
 
-void OpenGLShader::compileOrGetVulkanBinaries(
-    const std::unordered_map<ShaderType, std::string> &shaderSources)
+void OpenGLShader::compileOrGetVulkanBinaries(const std::unordered_map<ShaderType, std::string> &shaderSources)
 {
     // TODO: Compile the shader source code
 }
@@ -153,7 +154,9 @@ void OpenGLShader::uploadUniformInt(const std::string &name, int value)
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -169,7 +172,9 @@ void OpenGLShader::uploadUniformFloat(const std::string &name, float value)
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -184,7 +189,9 @@ void OpenGLShader::uploadUniformFloat2(const std::string &name, const glm::vec2 
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -199,7 +206,9 @@ void OpenGLShader::uploadUniformFloat3(const std::string &name, const glm::vec3 
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -214,7 +223,9 @@ void OpenGLShader::uploadUniformFloat4(const std::string &name, const glm::vec4 
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -229,7 +240,9 @@ void OpenGLShader::uploadUniformMat3(const std::string &name, const glm::mat3 &m
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;
@@ -244,7 +257,9 @@ void OpenGLShader::uploadUniformMat4(const std::string &name, const glm::mat4 &m
     {
         if (m_uniformErrordCache.find(name) == m_uniformErrordCache.end())
         {
+#if UNIFORM_DEBUG
             LOG_ERROR("Uniform {0} not found!", name);
+#endif
             m_uniformErrordCache[name] = true;
         }
         return;

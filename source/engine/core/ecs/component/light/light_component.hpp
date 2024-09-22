@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include "render/texture/texture_2d.hpp"
 #include "render/shader/shader.hpp"
+#include "ecs/aw_component.hpp"
 namespace Airwave
 {
 enum class LightType
@@ -24,10 +25,10 @@ struct LightComponent
     glm::vec3 position;  // 光源位置（对点光源和聚光灯有效）
     glm::vec3 direction; // 光源方向（对平行光和聚光灯有效）
 
-    float constant;   // 衰减系数（点光源和聚光灯使用）
-    float linear;     // 衰减系数（点光源和聚光灯使用）
-    float quadratic;  // 衰减系数（点光源和聚光灯使用）
-    float cutOff;     // 聚光灯内切角
+    float constant;    // 衰减系数（点光源和聚光灯使用）
+    float linear;      // 衰减系数（点光源和聚光灯使用）
+    float quadratic;   // 衰减系数（点光源和聚光灯使用）
+    float cutOff;      // 聚光灯内切角
     float outerCutOff; // 聚光灯外切角
 
     float shadowBias; // 阴影偏移
@@ -38,10 +39,8 @@ struct LightComponent
     std::shared_ptr<Texture2D> irradianceMap;  // 漫反射环境光贴图（用于PBR）
     std::shared_ptr<Texture2D> environmentMap; // 环境贴图（用于PBR）
 
-    LightComponent(LightType type = {}, float intensity = {},
-                   bool castsShadow = false)
-        : type(type), intensity(intensity), shadowBias(0.005f),
-          castsShadow(castsShadow)
+    LightComponent(LightType type = {}, float intensity = {}, bool castsShadow = false)
+        : type(type), intensity(intensity), shadowBias(0.005f), castsShadow(castsShadow)
     {
         // 默认光源位置和方向
         position  = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -51,15 +50,13 @@ struct LightComponent
         specular  = glm::vec3(1.0f);
 
         // 默认光源衰减系数
-        constant = 1.0f;
-        linear   = 0.09f;
+        constant  = 1.0f;
+        linear    = 0.09f;
         quadratic = 0.032f;
 
         // 默认聚光灯内外切角
-        cutOff     = glm::cos(glm::radians(12.5f));
+        cutOff      = glm::cos(glm::radians(12.5f));
         outerCutOff = glm::cos(glm::radians(17.5f));
-        
-
     }
 };
 

@@ -74,7 +74,6 @@ void TrackballController::setUpBasicEvent()
 
 void TrackballController::zoom(float delta)
 {
-
     float distance = glm::distance(m_camera->getPosition(), m_target);
     distance -= delta * m_zoomSpeed;
 

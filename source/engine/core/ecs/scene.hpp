@@ -29,6 +29,7 @@ class Scene : public std::enable_shared_from_this<Scene>
     // 实体操作
     std::shared_ptr<AwEntity> createAwEntity(const std::string &name = "AwEntity");
     std::shared_ptr<AwEntity> getAwEntity(entt::entity entity);
+    std::shared_ptr<AwEntity> getAwEntity(const std::string &name);
     void destroyAwEntity(const std::shared_ptr<AwEntity> &entity);
     void destroyAllAwEntities();
 

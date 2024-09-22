@@ -31,6 +31,8 @@ namespace Airwave
         virtual void enable(RenderState state)  = 0;
         virtual void disable(RenderState state)  = 0;
 
+        virtual void setPolygonMode(RenderPolygonMode mode) const = 0;
+
         virtual void onViewportResize(uint32_t width, uint32_t height) const = 0;
         virtual void drawIndexed(const std::shared_ptr<VertexArray> &, uint32_t count) const = 0; // count为0则绘制整个IndexBuffer
 

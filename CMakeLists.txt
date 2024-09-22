@@ -73,8 +73,14 @@ include_directories(${CMAKE_SOURCE_DIR}/external/glad/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/imgui)
 include_directories(${CMAKE_SOURCE_DIR}/external/imgui/backends)
 include_directories(${CMAKE_SOURCE_DIR}/external/nlohmann_json)
+include_directories(${CMAKE_SOURCE_DIR}/external/tiny_gltf)
+include_directories(${CMAKE_SOURCE_DIR}/external/tiny_obj)
 
 # 添加子目录
 add_subdirectory(external)
 add_subdirectory(source/engine)
 add_subdirectory(source/sandbox)
+
+
+#添加图标
+set(APP_ICON "${CMAKE_SOURCE_DIR}/install/assets/pictures/airwave_icon.png")

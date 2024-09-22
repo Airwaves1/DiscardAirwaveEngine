@@ -38,6 +38,18 @@ std::shared_ptr<AwEntity> Scene::getAwEntity(entt::entity entity)
     return nullptr;
 }
 
+std::shared_ptr<AwEntity> Scene::getAwEntity(const std::string &name)
+{
+    for (const auto &[entity, awEntity] : m_awEntityMap)
+    {
+        if (awEntity->getName() == name)
+        {
+            return awEntity;
+        }
+    }
+    return nullptr;
+}
+
 void Scene::destroyAwEntity(const std::shared_ptr<AwEntity> &entity)
 {
     if (entity && m_registry.valid(entity->getEntity()))

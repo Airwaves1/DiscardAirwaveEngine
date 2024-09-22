@@ -30,6 +30,12 @@ add_subdirectory(stb_image)
 # nlohmann_json
 add_subdirectory(nlohmann_json)
 
+# tiny_gltf
+add_subdirectory(tiny_gltf)
+
+#tiny_obj
+add_subdirectory(tiny_obj)
+
 # 查找 Vulkan
 find_package(Vulkan REQUIRED)
 if (Vulkan_FOUND)
@@ -52,3 +58,5 @@ target_link_libraries(external INTERFACE glm)
 target_link_libraries(external INTERFACE ImGui)
 target_link_libraries(external INTERFACE stb_image)
 target_link_libraries(external INTERFACE nlohmann_json)
+target_link_libraries(external INTERFACE tiny_gltf)
+target_link_libraries(external INTERFACE tiny_obj)

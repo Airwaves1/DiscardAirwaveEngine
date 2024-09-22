@@ -94,4 +94,41 @@ void SphereGeometry::updateData()
 
 void SphereGeometry::draw() const { RenderCommand::DrwaIndexed(m_vertexArray); }
 
+PlaneGeometry::PlaneGeometry(float width, float height, int widthSegments, int heightSegments) {
+    m_width = width;
+    m_height = height;
+    m_widthSegments = widthSegments;
+    m_heightSegments = heightSegments;
+    updateData();
+}
+
+void PlaneGeometry::updateData() {
+    std::vector<AWVertex> vertices;
+    std::vector<uint32_t> indices;
+    GeometryUtils::CreatePlane(vertices, indices, m_width, m_height, m_widthSegments, m_heightSegments);
+
+    m_vertices = GeometryUtils::ConvertAWVertexToFloatArray(vertices);
+    m_indices = indices;
+
+    if (!m_vertexArray) m_vertexArray = VertexArray::Create();
+    {
+        m_vertexArray->bind();
+        auto vertexBuffer = VertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(float));
+        vertexBuffer->setBufferLayout({
+            {ShaderDataType::FLOAT3, "a_position"},
+            {ShaderDataType::FLOAT3, "a_normal"},
+            {ShaderDataType::FLOAT2, "a_uv"},
+        });
+        m_vertexArray->addVertexBuffer(vertexBuffer);
+
+        auto indexBuffer = IndexBuffer::Create(indices.data(), m_indices.size() * sizeof(uint32_t));
+        m_vertexArray->setIndexBuffer(indexBuffer);
+        m_vertexArray->unbind();
+    }
+}
+
+void PlaneGeometry::draw() const {
+    RenderCommand::DrwaIndexed(m_vertexArray);
+}
+
 } // namespace Airwave

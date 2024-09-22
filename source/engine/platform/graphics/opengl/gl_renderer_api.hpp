@@ -18,6 +18,8 @@ namespace Airwave
         virtual void enable(RenderState state) override;
         virtual void disable(RenderState state) override;
 
+        virtual void setPolygonMode(RenderPolygonMode mode) const override;
+
         virtual void onViewportResize(uint32_t width, uint32_t height) const override;
 
         virtual void drawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count = 0) const override;

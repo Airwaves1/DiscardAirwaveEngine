@@ -16,6 +16,8 @@ class RenderCommand
                                              RenderClearFlag::Stencil);
     static void SetClearColor(const glm::vec4 &color);
 
+    static void SetPolygonMode(RenderPolygonMode mode);
+
     static void Enable(RenderState state);
     static void Disable(RenderState state);
 

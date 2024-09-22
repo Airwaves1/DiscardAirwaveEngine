@@ -13,7 +13,10 @@ void RenderCommand::DrwaIndexed(const std::shared_ptr<VertexArray> &va, uint32_t
 {
     va->bind();
     if (count == 0)
-        s_RendererAPI->drawIndexed(va, va->getIndexBuffer()->getCount());
+    {
+        uint32_t c = va->getIndexBuffer()->getCount();
+        s_RendererAPI->drawIndexed(va, c);
+    }
     else
         s_RendererAPI->drawIndexed(va, count);
 }
@@ -21,6 +24,8 @@ void RenderCommand::DrwaIndexed(const std::shared_ptr<VertexArray> &va, uint32_t
 void RenderCommand::Clear(RenderClearFlag flag) { s_RendererAPI->clear(flag); }
 
 void RenderCommand::SetClearColor(const glm::vec4 &color) { s_RendererAPI->setClearColor(color); }
+
+void RenderCommand::SetPolygonMode(RenderPolygonMode mode) { s_RendererAPI->setPolygonMode(mode); }
 
 void RenderCommand::Enable(RenderState state) { s_RendererAPI->enable(state); }
 

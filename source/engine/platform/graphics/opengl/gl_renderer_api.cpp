@@ -68,6 +68,24 @@ namespace Airwave
         }
     }
 
+    void OpenGLRendererAPI::setPolygonMode(RenderPolygonMode mode) const
+    {
+        switch (mode)
+        {
+        case RenderPolygonMode::Fill:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            break;
+        case RenderPolygonMode::Line:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            break;
+        case RenderPolygonMode::Point:
+            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+            break;
+        default:
+            break;
+        }
+    }
+
     void OpenGLRendererAPI::onViewportResize(uint32_t width, uint32_t height) const
     {
         glViewport(0, 0, width, height);

@@ -2,6 +2,7 @@
 
 #include "render/material/material.hpp"
 #include "ecs/component/light/light_component.hpp"
+#include "ecs/component/material/material_component.hpp"
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <vector>
@@ -12,13 +13,13 @@ namespace Airwave
 class LightSystem : public System
 {
   public:
-    LightSystem() = default;
+    LightSystem()  = default;
     ~LightSystem() = default;
 
     virtual void update(std::shared_ptr<Scene> scene, float deltaTime) {}
 
     // 更新光源数据
-    void updateLights(entt::registry& registry)
+    void updateLights(entt::registry &registry)
     {
         m_lights.clear();
 
@@ -34,42 +35,51 @@ class LightSystem : public System
             });
     }
 
-    void applyLightsToMaterial(std::shared_ptr<Material> material)
+    void applyLightsToMaterial(const std::shared_ptr<MaterialComponent> &material) const
     {
-        material->setUniform("u_lightCount", static_cast<int>(m_lights.size()));
+        auto shader = material->shader;
+        if(shader == nullptr)
+        {
+            LOG_ERROR("Material shader is nullptr");
+            return;
+        }
+        shader->bind();
+        shader->uploadUniformInt("u_lightCount", static_cast<int>(m_lights.size()));
 
         for (size_t i = 0; i < m_lights.size(); i++)
         {
             const auto &light = m_lights[i];
-            material->setUniform("u_lights[" + std::to_string(i) + "].type", static_cast<int>(light.type));
-            material->setUniform("u_lights[" + std::to_string(i) + "].intensity", light.intensity);
-            material->setUniform("u_lights[" + std::to_string(i) + "].ambient", light.ambient);
-            material->setUniform("u_lights[" + std::to_string(i) + "].diffuse", light.diffuse);
-            material->setUniform("u_lights[" + std::to_string(i) + "].specular", light.specular);
-            if(light.type == LightType::Point){
-                material->setUniform("u_lights[" + std::to_string(i) + "].position", light.position);
-                material->setUniform("u_lights[" + std::to_string(i) + "].constant", light.constant);
-                material->setUniform("u_lights[" + std::to_string(i) + "].linear", light.linear);
-                material->setUniform("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
-            }else if(light.type == LightType::Directional){
-                material->setUniform("u_lights[" + std::to_string(i) + "].direction", light.direction);
-            }else if(light.type == LightType::Spot){
-                material->setUniform("u_lights[" + std::to_string(i) + "].position", light.position);
-                material->setUniform("u_lights[" + std::to_string(i) + "].direction", light.direction);
-                material->setUniform("u_lights[" + std::to_string(i) + "].constant", light.constant);
-                material->setUniform("u_lights[" + std::to_string(i) + "].linear", light.linear);
-                material->setUniform("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
-                material->setUniform("u_lights[" + std::to_string(i) + "].cutOff", light.cutOff);
-                material->setUniform("u_lights[" + std::to_string(i) + "].outerCutOff", light.outerCutOff);
+            shader->uploadUniformInt("u_lights[" + std::to_string(i) + "].type", static_cast<int>(light.type));
+            shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].intensity", light.intensity);
+            shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].ambient", light.ambient);
+            shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].diffuse", light.diffuse);
+            shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].specular", light.specular);
+            if (light.type == LightType::Point)
+            {
+                shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].position", light.position);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].constant", light.constant);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].linear", light.linear);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
+            }
+            else if (light.type == LightType::Directional)
+            {
+                shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].direction", light.direction);
+            }
+            else if (light.type == LightType::Spot)
+            {
+                shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].position", light.position);
+                shader->uploadUniformFloat3("u_lights[" + std::to_string(i) + "].direction", light.direction);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].constant", light.constant);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].linear", light.linear);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].quadratic", light.quadratic);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].cutOff", light.cutOff);
+                shader->uploadUniformFloat("u_lights[" + std::to_string(i) + "].outerCutOff", light.outerCutOff);
             }
         }
     }
 
     // 获取光源数据
-    const std::vector<LightComponent>& getLights() const
-    {
-        return m_lights;
-    }
+    const std::vector<LightComponent> &getLights() const { return m_lights; }
 
     // 设置最大光源数量
     void setMaxLights(size_t maxLights) { m_maxLights = maxLights; }

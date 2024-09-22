@@ -28,12 +28,18 @@ class Application
 
     const ApplicationSettings &getSettings() const { return m_settings; }
 
+    float getAspectRatio() const { return m_settings.width / (float)m_settings.height; }
+
+    const std::unique_ptr<AwWindow> &getWindow() const { return m_window; }
+
   protected:
     virtual void onConfiguration(ApplicationSettings &settings) {}
     virtual void onInit() {}
     virtual void onUpdate(float deltaTime) {}
     virtual void onRender() {}
     virtual void onDstroy() {}
+    virtual void onImGuiRender() {}
+
 
     std::chrono::steady_clock::time_point m_startTimePoint;
     std::chrono::steady_clock::time_point m_lastFrameTimePoint;

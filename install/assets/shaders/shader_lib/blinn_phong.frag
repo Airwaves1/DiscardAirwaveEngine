@@ -162,7 +162,7 @@ vec3 CalDirectionalLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, L
 vec3 CalSpotLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {
     vec3 f = vec3(0.0);
 
-    vec3 lightDir = normalize(light.position - worldPosition);
+    vec3 lightDir = normalize(worldPosition - light.position);
 
     float diff = max(dot(normal, -lightDir), 0.0);
 
@@ -178,39 +178,35 @@ vec3 CalSpotLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light li
 
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);
 
-    float theta = dot(lightDir, normalize(-light.direction));
+    float theta = dot(lightDir, normalize(light.direction));
 
-    if(theta < light.cutOff) {
+    float epsilon = light.cutOff - light.outerCutOff;
 
-        // float epsilon = light.cutOff - light.outerCutOff;
-
-        // float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
 #ifdef USE_DIFFUSE_MAP
 
-        vec3 diffuseColor = texture(u_material.diffuseMap, v_uv).rgb;
+    vec3 diffuseColor = texture(u_material.diffuseMap, v_uv).rgb;
 
-        vec3 specularColor = texture(u_material.specularMap, v_uv).rgb;
+    vec3 specularColor = texture(u_material.specularMap, v_uv).rgb;
 
-        vec3 ambient = light.ambient * diffuseColor;
+    vec3 ambient = light.ambient * diffuseColor * attenuation;
 
-        vec3 diffuse = light.diffuse * diff * diffuseColor * attenuation;
+    vec3 diffuse = light.diffuse * diff * diffuseColor * attenuation * intensity;
 
-        vec3 specular = (light.specular * spec) * specularColor * attenuation;
+    vec3 specular = (light.specular * spec) * specularColor * attenuation * intensity;
 
 #else
 
-        vec3 ambient = light.ambient * u_material.ambient;
+    vec3 ambient = light.ambient * u_material.ambient * attenuation;
 
-        vec3 diffuse = (light.diffuse * diff) * u_material.diffuse;
+    vec3 diffuse = (light.diffuse * diff) * u_material.diffuse * attenuation * intensity;
 
-        vec3 specular = (light.specular * spec) * u_material.specular;  
+    vec3 specular = (light.specular * spec) * u_material.specular * attenuation * intensity;
 
 #endif
 
-        f = ambient + diffuse + specular;
-    } else {
-        f = vec3(light.ambient * texture(u_material.diffuseMap, v_uv).rgb);
-    }
+    f = ambient + diffuse + specular;
+
     return f;
 }

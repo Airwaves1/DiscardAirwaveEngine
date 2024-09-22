@@ -19,6 +19,13 @@ enum class RenderState : uint8_t
     LineSmooth  = 1 << 7, // 1000 0000
 };
 
+enum class RenderPolygonMode : uint8_t
+{
+    Fill  = 0,
+    Line  = 1,
+    Point = 2,
+};
+
 enum class RenderClearFlag : uint8_t
 {
     Color   = 1 << 0,
@@ -60,6 +67,12 @@ class RenderStateManager
 
     static std::vector<std::string> GetRenderStateStrings(RenderState state);
     static std::vector<std::string> GetClearFlagStrings(RenderClearFlag flag);
+
+    static std::string GetRenderStateString(RenderState state);
+    static std::string GetClearFlagString(RenderClearFlag flag);
+
+    static std::string GetRenderPolygonModeString(RenderPolygonMode mode);
+    
 };
 
 } // namespace Airwave

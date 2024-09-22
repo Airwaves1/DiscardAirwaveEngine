@@ -3,41 +3,51 @@
 #include "render/material/material.hpp"
 #include "render/material/basic_material.hpp"
 #include "render/texture/texture_2d.hpp"
+#include "render/shader/shader.hpp"
+#include "ecs/aw_component.hpp"
 
 namespace Airwave
 {
-struct BasicMaterialComponent
-{
-    BasicMaterialComponent() {
-        material = std::make_shared<Material>();
-        material->setShader(SHADER_LIB.load("basic_material", SHADER_DIR "shader_lib/basic.vert",
-                                            SHADER_DIR "shader_lib/basic.frag"));
-    }
 
-    glm::vec4 color = glm::vec4(1.0f);
-    std::shared_ptr<Material> material;
+enum class MaterialType
+{
+    Standard,
+    Unlit,
+    BlinnPhong,
+    Custom
 };
 
-class PhongMaterialComponent
+struct MaterialComponent
 {
-  public:
-    PhongMaterialComponent()
-    {
-        material = std::make_shared<Material>();
-        material->setShader(SHADER_LIB.load("phong_material", SHADER_DIR "shader_lib/phong.vert",
-                                            SHADER_DIR "shader_lib/phong.frag"));
-    }
+    std::string name = "material";
 
-    glm::vec3 ambient  = glm::vec3(1.0f); // 材质在环境光下表面反射的颜色
-    glm::vec3 diffuse  = glm::vec3(0.5f); // 材质在漫反射光下表面反射的颜色
-    glm::vec3 specular = glm::vec3(1.0f); // 材质在镜面光下表面反射的颜色
-    float shininess    = 32.0f;          // 材质的高光度
+    MaterialType type = MaterialType::BlinnPhong;
 
+    bool doubleSided = false;
+
+    float alpha = 1.0f;
+
+    glm::vec3 diffuse    = glm::vec3(0.5f); // diffuse
+    glm::vec3 ambient  = glm::vec3(1.0f);
+    glm::vec3 specular = glm::vec3(1.0f);
+    float shininess    = 32.0f;
+
+    // PBR 特性
+    float metallic  = 0.0f; // 金属度
+    float roughness = 1.0f; // 粗糙度
+
+    // 纹理
     std::shared_ptr<Texture2D> diffuseMap;
     std::shared_ptr<Texture2D> specularMap;
     std::shared_ptr<Texture2D> normalMap;
-    
-    std::shared_ptr<Material> material;
+    std::shared_ptr<Texture2D> metallicMap;  // PBR
+    std::shared_ptr<Texture2D> roughnessMap; // PBR
+    std::shared_ptr<Texture2D> emissionMap;  // 自发光
+
+    std::shared_ptr<Shader> shader; // 更改着色器后需要将needUpdate设置为true
+
+    bool specularHighlight = true; // 是否开启高光
+    bool needUpdate = false;
 };
 
 } // namespace Airwave

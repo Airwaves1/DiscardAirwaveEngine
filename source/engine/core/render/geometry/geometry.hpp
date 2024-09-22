@@ -15,6 +15,10 @@ class Geometry
 
     virtual void updateData() = 0;
 
+    virtual void setData(const std::vector<AWVertex> &vertices, const std::vector<uint32_t> &indices) {}
+    virtual void setData(const std::vector<float> &vertices, const std::vector<uint32_t> &indices) {}
+
+    virtual void setVertices(const std::vector<AWVertex> &vertices) {}
     virtual void setVertices(const std::vector<float> &vertices) {}
     virtual void setIndices(const std::vector<uint32_t> &indices) {}
 
@@ -63,9 +67,8 @@ class CubeGeometry : public Geometry
 class SphereGeometry : public Geometry
 {
   public:
-    SphereGeometry(float radius = 1.0f, int widthSegments = 32, int heightSegments = 32,
-                   float phiStart = 0.0f, float phiLength = 2 * PI, float thetaStart = 0.0f,
-                   float thetaLength = PI);
+    SphereGeometry(float radius = 1.0f, int widthSegments = 32, int heightSegments = 32, float phiStart = 0.0f,
+                   float phiLength = 2 * PI, float thetaStart = 0.0f, float thetaLength = PI);
     ~SphereGeometry() override = default;
 
     void updateData() override;
@@ -95,6 +98,40 @@ class SphereGeometry : public Geometry
     float m_phiLength;
     float m_thetaStart;
     float m_thetaLength;
+};
+
+class PlaneGeometry : public Geometry
+{
+  public:
+    PlaneGeometry(float width = 1.0f, float height = 1.0f, int widthSegments = 1, int heightSegments = 1);
+    ~PlaneGeometry() override = default;
+
+    void updateData() override;
+    void draw() const override;
+
+    void setSize(float width, float height)
+    {
+        m_width  = width;
+        m_height = height;
+        updateData();
+    }
+    void setSegments(int widthSegments, int heightSegments)
+    {
+        m_widthSegments  = widthSegments;
+        m_heightSegments = heightSegments;
+        updateData();
+    }
+
+    float getWidth() const { return m_width; }
+    float getHeight() const { return m_height; }
+    int getWidthSegments() const { return m_widthSegments; }
+    int getHeightSegments() const { return m_heightSegments; }
+
+  private:
+    float m_width;
+    float m_height;
+    int m_widthSegments;
+    int m_heightSegments;
 };
 
 } // namespace Airwave

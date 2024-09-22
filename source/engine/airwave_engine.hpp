@@ -53,6 +53,9 @@
 #include "render/object/mesh.hpp"
 #include "render/object/fullscreen_quad.hpp"
 
+//----------model----------
+#include "render/model/model_loader.hpp"
+
 
 //----------ECS----------
 #include "ecs/uuid.hpp"
@@ -60,12 +63,21 @@
 #include "ecs/scene.hpp"
 #include "ecs/node.hpp"
 #include "ecs/system/forward_render_system.hpp"
+#include "ecs/system/light_system.hpp"
+#include "ecs/system/camera_system.hpp"
 
 //----------Component----------
 #include "ecs/component/material/material_component.hpp"
 #include "ecs/component/geometry/geometry_component.hpp"
 #include "ecs/component/light/light_component.hpp"
+#include "ecs/component/camera/camera_component.hpp"
+#include "ecs/component/camera/camera_controller_component.hpp"
+#include "ecs/component/transform/transform_component.hpp"
+#include "ecs/component/object/mesh_component.hpp"
+#include "ecs/component/object/model_component.hpp"
 
+//----------imgui----------
+#include <imgui.h>
 
 //----------application----------
 #include "application/application.hpp"

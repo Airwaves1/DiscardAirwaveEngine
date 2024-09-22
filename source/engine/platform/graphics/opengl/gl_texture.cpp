@@ -15,7 +15,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, const TextureSpecifica
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-    AW_ASSERT(data, "Failed to load image!");
+    AW_ASSERT(data, "Failed to load image!:"+path);
 
     m_width         = width;
     m_height        = height;

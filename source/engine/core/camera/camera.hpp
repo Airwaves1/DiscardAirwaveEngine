@@ -45,6 +45,10 @@ class Camera
     // 设置位置
     void setPosition(const glm::vec3 &position)
     {
+        if (m_position == position)
+        {
+            return;
+        }
         m_position = position;
         m_dirty    = true;
     }
@@ -52,6 +56,10 @@ class Camera
     // 设置旋转（四元数）
     void setRotation(const glm::quat &rotation)
     {
+        if (m_rotation == rotation)
+        {
+            return;
+        }
         m_rotation = rotation;
         m_dirty    = true;
     }
@@ -59,6 +67,10 @@ class Camera
     // 旋转相机
     void rotate(const glm::quat &delta)
     {
+        if (delta == glm::quat(1.0f, 0.0f, 0.0f, 0.0f))
+        {
+            return;
+        }
         m_rotation = glm::normalize(delta * m_rotation);
         m_dirty    = true;
     }
@@ -66,6 +78,10 @@ class Camera
     // 设置世界坐标系的上方向
     void setWorldUp(const glm::vec3 &worldUp)
     {
+        if (m_worldUp == worldUp)
+        {
+            return;
+        }
         m_worldUp = glm::normalize(worldUp);
         m_dirty   = true;
     }
@@ -113,24 +129,40 @@ class PerspectiveCamera : public Camera
 
     void setFarClip(float far) override
     {
+        if (m_far == far)
+        {
+            return;
+        }
         m_far = far;
         updateProjectionMatrix();
     }
 
     void setNearClip(float near) override
     {
+        if (m_near == near)
+        {
+            return;
+        }
         m_near = near;
         updateProjectionMatrix();
     }
 
     void setFov(float fov)
     {
+        if (m_fov == fov)
+        {
+            return;
+        }
         m_fov = fov;
         updateProjectionMatrix();
     }
 
     void setAspect(float aspect)
     {
+        if (m_aspect == aspect)
+        {
+            return;
+        }
         m_aspect = aspect;
         updateProjectionMatrix();
     }
@@ -178,12 +210,20 @@ class OrthographicCamera : public Camera
 
     void setFarClip(float far) override
     {
+        if (m_far == far)
+        {
+            return;
+        }
         m_far = far;
         updateProjectionMatrix();
     }
 
     void setNearClip(float near) override
     {
+        if(m_near == near)
+        {
+            return;
+        }
         m_near = near;
         updateProjectionMatrix();
     }

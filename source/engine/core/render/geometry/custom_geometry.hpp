@@ -7,9 +7,22 @@ namespace Airwave
 {
 class CustomGeometry : public Geometry
 {
-public:
-    CustomGeometry() = default;
+  public:
+    CustomGeometry(const std::vector<float> &vertices, const std::vector<uint32_t> &indices)
+    {
+        m_vertices = vertices;
+        m_indices = indices;
+        updateData();
+    }
+
     ~CustomGeometry() override = default;
+
+    void setVertices(const std::vector<AWVertex> &vertices) override
+    {
+        std::vector<float> data = GeometryUtils::ConvertAWVertexToFloatArray(vertices);
+        m_vertices = data;
+        updateData();
+    }
 
     void setVertices(const std::vector<float> &vertices) override
     {
@@ -38,7 +51,8 @@ public:
 
         m_vertexArray->bind();
         {
-            auto vertexBuffer = VertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(float));
+            auto vertexBuffer =
+                VertexBuffer::Create(m_vertices.data(), m_vertices.size() * sizeof(float));
             vertexBuffer->setBufferLayout({
                 {ShaderDataType::FLOAT3, "a_position"},
                 {ShaderDataType::FLOAT3, "a_normal"},
