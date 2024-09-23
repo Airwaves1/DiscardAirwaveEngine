@@ -65,7 +65,7 @@ class MaterialSystem : public System
 
         if (mat->diffuseMap == nullptr)
         {
-            mat->diffuseMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
+            // mat->diffuseMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
             LOG_WARN("MaterialComponent: {0} has no diffuse map, use default diffuse map", mat->name);
         }
         else
@@ -75,7 +75,7 @@ class MaterialSystem : public System
 
         if(mat->specularMap == nullptr)
         {
-            mat->specularMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
+            // mat->specularMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
             LOG_WARN("MaterialComponent: {0} has no specular map, use default specular map", mat->name);
         }
         else

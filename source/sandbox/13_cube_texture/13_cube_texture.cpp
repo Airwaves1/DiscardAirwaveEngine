@@ -15,7 +15,9 @@ class Sandbox : public Airwave::Application
 
         auto model_entity_1 = m_scene->createAwEntity("model_1");
         auto modelComponent = model_entity_1->addComponent<Airwave::ModelComponent>();
-        modelComponent->load(MODEL_DIR "nanosuit/nanosuit.obj", model_entity_1);
+        // modelComponent->load(MODEL_DIR "nanosuit/nanosuit.obj", model_entity_1);
+        // modelComponent->load(MODEL_DIR "mountain/mount.blend1.obj", model_entity_1);
+        // modelComponent->load(MODEL_DIR "57-estancia_comedor_obj/room.obj", model_entity_1);
         auto model_entity_1_transform = model_entity_1->addComponent<Airwave::TransformComponent>();
         model_entity_1_transform->setPosition(glm::vec3(0.0f, -10.0f, -10.0f));
 
@@ -38,11 +40,11 @@ class Sandbox : public Airwave::Application
         pointLight->specular  = glm::vec3(1.0f, 1.0f, 1.0f);
 
 
-        // 添加渲染系统
+        // // 添加渲染系统
         auto forwardRenderSystem = std::make_shared<Airwave::ForwardRenderSystem>();
         m_scene->addSystem(forwardRenderSystem);
 
-        // 添加相机系统
+        // // 添加相机系统
         auto cameraSystem = std::make_shared<Airwave::CameraSystem>();
         m_scene->addSystem(cameraSystem);
 
