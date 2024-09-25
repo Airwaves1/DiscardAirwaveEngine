@@ -1,6 +1,7 @@
 #include "fullscreen_quad.hpp"
 #include "render/renderer/renderer.hpp"
 #include "render/renderer/render_command.hpp"
+#include "render/shader/shader_library.hpp"
 
 namespace Airwave
 {
@@ -8,8 +9,7 @@ namespace Airwave
 FullScreenQuad::FullScreenQuad()
 {
     float vertices[] = {
-        -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
     };
 
     uint32_t indices[] = {
@@ -36,6 +36,7 @@ FullScreenQuad::FullScreenQuad()
 
         in vec2 v_texCoord;
 
+        uniform sampler2D u_depthTexture;
         uniform sampler2D u_texture;
 
         void main()
@@ -45,7 +46,7 @@ FullScreenQuad::FullScreenQuad()
         }
     )";
 
-    m_shader = Shader::Create(vertexSrc, fragmentSrc, false);
+    m_shader = SHADER_LIB.load("fullscreen_quad", vertexSrc, fragmentSrc, false);
 
     m_vertexArray = VertexArray::Create();
     {
@@ -62,49 +63,106 @@ FullScreenQuad::FullScreenQuad()
     }
 }
 
-void FullScreenQuad::render(const std::shared_ptr<Framebuffer> &framebuffer)
+void FullScreenQuad::resolve(const std::shared_ptr<Framebuffer> &framebuffer)
 {
-    RenderCommand::SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
-    RenderCommand::Clear();
-
-    if (framebuffer)
+    if (framebuffer->getSpecification().enableMSAA)
     {
-        if (framebuffer->getSpecification().enableMSAA)
+        if (!m_resolveFramebuffer)
         {
-            if (m_resolveFramebuffer == nullptr)
-            {
-                FramebufferSpecification spec;
-                spec.colorAttachmentCount   = 1;
-                spec.depthAttachmentCount   = 1;
-                spec.stencilAttachmentCount = 0;
-                spec.enableMSAA             = false;
-                spec.samples                = 1;
-                m_resolveFramebuffer =
-                    Framebuffer::Create(framebuffer->getWidth(), framebuffer->getHeight(), spec);
-            }
-            if(m_resolveFramebuffer->getWidth() != framebuffer->getWidth() || m_resolveFramebuffer->getHeight() != framebuffer->getHeight())
-            {
-                m_resolveFramebuffer->resize(framebuffer->getWidth(), framebuffer->getHeight());
-            }
+            FramebufferSpecification spec;
+            spec.colorAttachmentCount   = framebuffer->getSpecification().colorAttachmentCount;
+            spec.depthAttachmentCount   = 1;
+            spec.stencilAttachmentCount = 0;
+            spec.enableMSAA             = false;
+            spec.samples                = 1;
+            m_resolveFramebuffer        = Framebuffer::Create(framebuffer->getWidth(), framebuffer->getHeight(), spec);
+        }
 
-            framebuffer->resolve(m_resolveFramebuffer->getFramebufferID());
-            m_shader->bind();
-            m_resolveFramebuffer->getColorAttachments()[0]->bind(0);
-        }
-        else
+        if (m_resolveFramebuffer->getWidth() != framebuffer->getWidth() ||
+            m_resolveFramebuffer->getHeight() != framebuffer->getHeight())
         {
-            m_shader->bind();
-            framebuffer->getColorAttachments()[0]->bind(0);
+            m_resolveFramebuffer->resize(framebuffer->getWidth(), framebuffer->getHeight());
         }
+        // 解析多重采样的附件
+        framebuffer->resolve(m_resolveFramebuffer->getFramebufferID());
     }
     else
     {
-        LOG_ERROR("Framebuffer is nullptr");
+
+        m_resolveFramebuffer = framebuffer;
+    }
+}
+
+void FullScreenQuad::renderToDefaultFramebuffer()
+{
+    if (!m_resolveFramebuffer)
+    {
+        LOG_ERROR("FullScreenQuad Framebuffer is nullptr");
         return;
     }
 
-    m_shader->uploadUniformInt("u_texture", 0);
-    RenderCommand::DrwaIndexed(m_vertexArray);
+    RenderCommand::SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
+    RenderCommand::Clear();
+    RenderCommand::Disable(RenderState::DepthTest);
+    m_shader->bind();
+
+    auto colorAttachment = m_resolveFramebuffer->getColorAttachments()[0];
+    if (colorAttachment)
+    {
+        colorAttachment->bind(0);
+        m_shader->uploadUniformInt("u_texture", 0);
+    }
+    else
+    {
+        LOG_ERROR("Color attachment is nullptr");
+    }
+
+    auto depthAttachment = m_resolveFramebuffer->getDepthAttachment();
+    if (depthAttachment)
+    {
+        depthAttachment->bind(1);
+        m_shader->uploadUniformInt("u_depthTexture", 1);
+    }
+
+    RenderCommand::DrawIndexed(m_vertexArray);
+}
+
+void FullScreenQuad::render(const std::shared_ptr<Texture2D> &texture, const std::shared_ptr<Shader> &shader)
+{
+    if (!m_resolveFramebuffer)
+    {
+        LOG_ERROR("FullScreenQuad Framebuffer is nullptr");
+        return;
+    }
+
+    RenderCommand::SetClearColor({0.0f, 0.0f, 0.0f, 1.0f});
+    RenderCommand::Clear();
+    RenderCommand::Disable(RenderState::DepthTest);
+
+    m_resolveFramebuffer->bind();
+
+    shader->bind();
+
+    if (texture)
+    {
+        texture->bind(0);
+        shader->uploadUniformInt("u_texture", 0);
+    }
+    else
+    {
+        m_resolveFramebuffer->getColorAttachments()[0]->bind(0);
+    }
+
+    auto depthAttachment = m_resolveFramebuffer->getDepthAttachment();
+    if (depthAttachment)
+    {
+        depthAttachment->bind(1);
+        shader->uploadUniformInt("u_depthTexture", 1);
+    }
+
+    RenderCommand::DrawIndexed(m_vertexArray);
+
+    m_resolveFramebuffer->unbind();
 }
 
 } // namespace Airwave

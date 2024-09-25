@@ -91,7 +91,7 @@ class GeometryComponent
             return;
         }
 
-        RenderCommand::DrwaIndexed(m_vertexArray);
+        RenderCommand::DrawIndexed(m_vertexArray);
     }
 
     uint32_t getIndicesCount() const { return m_indices.size(); }

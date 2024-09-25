@@ -38,7 +38,7 @@ void Renderer::Submit(const std::shared_ptr<Shader> &shader, const std::shared_p
     shader->uploadUniformMat4("u_projectionMatrix", s_SceneData->ProjectionMatrix);
     shader->uploadUniformMat4("u_modelMatrix", transform);
 
-    RenderCommand::DrwaIndexed(va);
+    RenderCommand::DrawIndexed(va);
 }
 void Renderer::OnViewportResize(uint32_t width, uint32_t height)
 {

@@ -25,6 +25,7 @@ class Shader
     virtual void unbind() const = 0;
 
     virtual std::string getName() const { return m_name; }
+    virtual void setName(const std::string &name) { m_name = name; }
 
     virtual void uploadUniformInt(const std::string &name, int value) = 0;
 

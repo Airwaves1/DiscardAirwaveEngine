@@ -19,6 +19,7 @@
 #include "ecs/component/object/mesh_component.hpp"
 #include "ecs/system/transform_system.hpp"
 #include "event/event_observer.hpp"
+#include "render/renderer/render_target.hpp"
 namespace Airwave
 {
 class ForwardRenderSystem : public System
@@ -30,17 +31,21 @@ class ForwardRenderSystem : public System
         m_fullScreenQuad = std::make_shared<Airwave::FullScreenQuad>();
 
         Airwave::FramebufferSpecification spec;
-        spec.enableMSAA = true;
-        spec.samples    = 4;
+        spec.enableMSAA = false;
+        spec.samples    = 8;
         m_framebuffer   = Airwave::Framebuffer::Create(1200, 900, spec);
 
         m_eventObserver = std::make_shared<EventObserver>();
-        m_eventObserver->onEvent<WindowResizeEvent>([this](const WindowResizeEvent &e)
-                                                    { 
-                                                        LOG_DEBUG("WindowResizeEvent: {0},{1}", e.getWindowWidth(), e.getWindowHeight());
-                                                        m_framebuffer->resize(e.getWindowWidth(), e.getWindowHeight()); });
+        m_eventObserver->onEvent<WindowResizeEvent>(
+            [this](const WindowResizeEvent &e)
+            {
+                // LOG_DEBUG("WindowResizeEvent: {0},{1}", e.getWindowWidth(), e.getWindowHeight());
+                m_framebuffer->resize(e.getWindowWidth(), e.getWindowHeight());
+            });
 
         m_materialSystem = std::make_shared<MaterialSystem>();
+
+        m_renderTarget = std::make_shared<RenderTarget>(1200, 900, TextureSpecification());
     }
     virtual ~ForwardRenderSystem() {}
 
@@ -74,13 +79,13 @@ class ForwardRenderSystem : public System
             m_transformSystem = scene->getSystem<TransformSystem>();
         }
 
-        // ########################## 2. 设置渲染目标 ##########################
+        // ########################## 3. 设置渲染目标 ##########################
         m_framebuffer->bind();
         RenderCommand::SetClearColor({0.2f, 0.2f, 0.2f, 1.0f});
         RenderCommand::Clear();
         RenderCommand::Enable(RenderState::DepthTest);
 
-        // ########################## 3. 获取灯光组件 ##########################
+        // ########################## 4. 获取灯光组件 ##########################
         if (!scene->hasSystem<LightSystem>())
         {
             m_lightSystem = std::make_shared<LightSystem>();
@@ -112,13 +117,6 @@ class ForwardRenderSystem : public System
                     return; // 继续处理下一个网格
                 }
 
-                // 获取或创建变换组件
-                // auto transformComponent = scene->getRegistry().try_get<TransformComponent>(entity);
-                // if (transformComponent == nullptr)
-                // {
-                //     transformComponent = &scene->getRegistry().emplace<TransformComponent>(entity); // 取地址
-                // }
-
                 // 更新材质信息
                 m_materialSystem->updateMaterial(mesh.materialComponent, cameraComponent, transform, deltaTime);
 
@@ -133,13 +131,55 @@ class ForwardRenderSystem : public System
 
         Renderer::EndScene();
         m_framebuffer->unbind();
+
         // 渲染全屏四边形
-        m_fullScreenQuad->render(m_framebuffer);
+        m_fullScreenQuad->resolve(m_framebuffer);
+
+        auto texture = m_fullScreenQuad->getFramebuffer()->getColorAttachments()[0];
+        m_fullScreenQuad->render(texture, shader);
+
+        m_fullScreenQuad->renderToDefaultFramebuffer();
     }
 
   private:
+    std::string vertexSrc = R"(
+        #version 410 core
+        layout(location = 0) in vec2 a_position;
+        layout(location = 1) in vec2 a_texCoord;
+
+        out vec2 v_texCoord;
+
+        void main()
+        {
+            gl_Position = vec4(a_position, 0.0, 1.0);
+            v_texCoord = a_texCoord;
+        }
+    )";
+
+    std::string fragmentSrc        = R"(
+        #version 410 core
+        layout(location = 0) out vec4 color;
+
+        in vec2 v_texCoord;
+
+        uniform sampler2D u_depthTexture;
+        uniform sampler2D u_texture;
+
+        void main()
+        {
+            // color = vec4(v_texCoord, 0.0, 1.0);
+
+            float depth = texture(u_depthTexture, v_texCoord).r;
+            color = texture(u_texture, v_texCoord);
+            color = vec4(color.rgb, 1.0);
+            // color = vec4(vec3(depth), 1.0);
+            // color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, 1.0);
+        }
+    )";
+    std::shared_ptr<Shader> shader = SHADER_LIB.load("test", vertexSrc, fragmentSrc, false);
     std::shared_ptr<Framebuffer> m_framebuffer;
     std::shared_ptr<FullScreenQuad> m_fullScreenQuad;
+    std::shared_ptr<RenderTarget> m_renderTarget;
 
     std::shared_ptr<LightSystem> m_lightSystem;
     std::shared_ptr<MaterialSystem> m_materialSystem;
@@ -149,12 +189,3 @@ class ForwardRenderSystem : public System
 };
 
 } // namespace Airwave
-
-// lightView.each([&](auto entity, PointLightComponent &light)
-// {
-//     material.material->setUniform("u_lightColor", light.light->color);
-//     material.material->setUniform("u_lightPosition", light.light->position);
-//     LOG_DEBUG("light position: {0},{1},{2}", light.light->position.x,
-//     light.light->position.y,
-//               light.light->position.z);
-// });

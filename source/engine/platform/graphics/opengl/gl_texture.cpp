@@ -15,7 +15,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, const TextureSpecifica
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-    AW_ASSERT(data, "Failed to load image!:"+path);
+    AW_ASSERT(data, "Failed to load image!:" + path);
 
     m_width         = width;
     m_height        = height;
@@ -53,8 +53,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, const TextureSpecifica
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat,
-                 GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 
     if (m_specification.generateMipmaps)
     {
@@ -83,8 +82,8 @@ OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, const TextureS
     {
         glGenTextures(1, &m_rendererID);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_rendererID);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_specification.samples, internalFormat,
-                                m_width, m_height, GL_TRUE);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_specification.samples, internalFormat, m_width, m_height,
+                                GL_TRUE);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     }
     else
@@ -98,8 +97,7 @@ OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, const TextureS
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat,
-                     GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
 
         if (m_specification.generateMipmaps)
         {
@@ -111,6 +109,33 @@ OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height, const TextureS
 }
 
 OpenGLTexture2D::~OpenGLTexture2D() { glDeleteTextures(1, &m_rendererID); }
+
+void OpenGLTexture2D::resize(uint32_t width, uint32_t height)
+{
+    m_width  = width;
+    m_height = height;
+
+    if (m_specification.enableMSAA)
+    {
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_rendererID);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_specification.samples,
+                                TextureInternalFormatToGL(m_specification.internalFormat), m_width, m_height, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+    }
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D, m_rendererID);
+        glTexImage2D(GL_TEXTURE_2D, 0, TextureInternalFormatToGL(m_specification.internalFormat), m_width, m_height, 0,
+                     TextureFormatToGL(m_specification.format), GL_UNSIGNED_BYTE, nullptr);
+
+        if (m_specification.generateMipmaps)
+        {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}
 
 void OpenGLTexture2D::bind(uint32_t slot) const
 {
@@ -141,8 +166,7 @@ void Airwave::OpenGLTexture2D::setData(void *data, uint32_t size)
     glBindTexture(GL_TEXTURE_2D, m_rendererID);
 
     // 上传完整的纹理数据
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat,
-                 GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 
     if (m_specification.generateMipmaps)
     {

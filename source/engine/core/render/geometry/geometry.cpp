@@ -38,7 +38,7 @@ void CubeGeometry::updateData()
     }
 }
 
-void CubeGeometry::draw() const { RenderCommand::DrwaIndexed(m_vertexArray); }
+void CubeGeometry::draw() const { RenderCommand::DrawIndexed(m_vertexArray); }
 
 void CubeGeometry::setSize(float width, float height, float depth)
 {
@@ -92,7 +92,7 @@ void SphereGeometry::updateData()
     }
 }
 
-void SphereGeometry::draw() const { RenderCommand::DrwaIndexed(m_vertexArray); }
+void SphereGeometry::draw() const { RenderCommand::DrawIndexed(m_vertexArray); }
 
 PlaneGeometry::PlaneGeometry(float width, float height, int widthSegments, int heightSegments) {
     m_width = width;
@@ -128,7 +128,7 @@ void PlaneGeometry::updateData() {
 }
 
 void PlaneGeometry::draw() const {
-    RenderCommand::DrwaIndexed(m_vertexArray);
+    RenderCommand::DrawIndexed(m_vertexArray);
 }
 
 } // namespace Airwave

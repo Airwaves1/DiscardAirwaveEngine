@@ -15,7 +15,7 @@ class Sandbox : public Airwave::Application
 
         auto model_entity_1 = m_scene->createAwEntity("model_1");
         auto modelComponent = model_entity_1->addComponent<Airwave::ModelComponent>();
-        // modelComponent->load(MODEL_DIR "nanosuit/nanosuit.obj", model_entity_1);
+        modelComponent->load(MODEL_DIR "nanosuit/nanosuit.obj", model_entity_1);
         // modelComponent->load(MODEL_DIR "mountain/mount.blend1.obj", model_entity_1);
         // modelComponent->load(MODEL_DIR "57-estancia_comedor_obj/room.obj", model_entity_1);
         auto model_entity_1_transform = model_entity_1->addComponent<Airwave::TransformComponent>();
@@ -26,7 +26,7 @@ class Sandbox : public Airwave::Application
         modelComponent_2->load(MODEL_DIR "intergalactic_spaceship-obj/Intergalactic_Spaceship-(Wavefront).obj",
                                model_entity_2);
         auto model_entity_2_transform = model_entity_2->addComponent<Airwave::TransformComponent>();
-        model_entity_2_transform->setPosition(glm::vec3(10.0f, -10.0f, -12.0f));
+        model_entity_2_transform->setPosition(glm::vec3(0.0f, 0.0f, -1.0f));
 
         // 添加光源
         // 点光源

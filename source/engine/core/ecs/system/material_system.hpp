@@ -65,18 +65,30 @@ class MaterialSystem : public System
 
         if (mat->diffuseMap == nullptr)
         {
-            // mat->diffuseMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
-            LOG_WARN("MaterialComponent: {0} has no diffuse map, use default diffuse map", mat->name);
+            static bool flag = false;
+            if (!flag)
+            {
+                LOG_WARN("MaterialComponent: {0} has no diffuse map, use default diffuse map", mat->name);
+                flag            = true;
+                mat->diffuseMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
+            }
+            // LOG_WARN("MaterialComponent: {0} has no diffuse map, use default diffuse map", mat->name);
         }
         else
         {
             mat->diffuseMap->bind(0);
         }
 
-        if(mat->specularMap == nullptr)
+        if (mat->specularMap == nullptr)
         {
-            // mat->specularMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
-            LOG_WARN("MaterialComponent: {0} has no specular map, use default specular map", mat->name);
+            static bool flag = false;
+            if (!flag)
+            {
+                mat->specularMap = Texture2D::Create(TEXTURE_DIR "R-C.jpeg");
+                LOG_WARN("MaterialComponent: {0} has no specular map, use default specular map", mat->name);
+                flag = true;
+            }
+            // LOG_WARN("MaterialComponent: {0} has no specular map, use default specular map", mat->name);
         }
         else
         {

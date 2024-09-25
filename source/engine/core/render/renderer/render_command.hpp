@@ -11,7 +11,7 @@ class RenderCommand
   public:
     static void Init();
 
-    static void DrwaIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count = 0);
+    static void DrawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count = 0);
     static void Clear(RenderClearFlag flag = RenderClearFlag::Color | RenderClearFlag::Depth |
                                              RenderClearFlag::Stencil);
     static void SetClearColor(const glm::vec4 &color);

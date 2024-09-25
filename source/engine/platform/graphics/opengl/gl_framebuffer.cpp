@@ -6,8 +6,7 @@
 
 namespace Airwave
 {
-OpenGLFramebuffer::OpenGLFramebuffer(uint32_t width, uint32_t height,
-                                     const FramebufferSpecification &spec)
+OpenGLFramebuffer::OpenGLFramebuffer(uint32_t width, uint32_t height, const FramebufferSpecification &spec)
 {
     m_width  = width;
     m_height = height;
@@ -56,8 +55,8 @@ void OpenGLFramebuffer::invalidate()
         auto colorAttachment = Texture2D::Create(m_width, m_height, spec);
         if (m_spec.enableMSAA)
         {
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i,
-                                   GL_TEXTURE_2D_MULTISAMPLE, colorAttachment->getRendererID(), 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D_MULTISAMPLE,
+                                   colorAttachment->getRendererID(), 0);
         }
         else
         {
@@ -77,10 +76,10 @@ void OpenGLFramebuffer::invalidate()
             {
                 glGenRenderbuffers(1, &m_renderbufferid);
                 glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferid);
-                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples,
-                                                 GL_DEPTH24_STENCIL8, m_width, m_height);
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                                          GL_RENDERBUFFER, m_renderbufferid);
+                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples, GL_DEPTH24_STENCIL8, m_width,
+                                                 m_height);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
+                                          m_renderbufferid);
             }
             else
             {
@@ -90,6 +89,10 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24STENCIL8;
                 spec.format         = TextureFormat::DEPTH;
 
+                if(m_depthAttachment)
+                {
+                    m_depthAttachment.reset();
+                }
                 m_depthAttachment = Texture2D::Create(m_width, m_height, spec);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D,
                                        m_depthAttachment->getRendererID(), 0);
@@ -101,10 +104,9 @@ void OpenGLFramebuffer::invalidate()
             {
                 glGenRenderbuffers(1, &m_renderbufferid);
                 glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferid);
-                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples,
-                                                 GL_DEPTH_COMPONENT24, m_width, m_height);
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER,
-                                          m_renderbufferid);
+                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples, GL_DEPTH_COMPONENT24, m_width,
+                                                 m_height);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderbufferid);
             }
             else
             {
@@ -114,6 +116,10 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24;
                 spec.format         = TextureFormat::DEPTH;
 
+                if(m_depthAttachment)
+                {
+                    m_depthAttachment.reset();
+                }
                 m_depthAttachment = Texture2D::Create(m_width, m_height, spec);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
                                        m_depthAttachment->getRendererID(), 0);
@@ -125,10 +131,8 @@ void OpenGLFramebuffer::invalidate()
             {
                 glGenRenderbuffers(1, &m_renderbufferid);
                 glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferid);
-                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples, GL_STENCIL_INDEX8,
-                                                 m_width, m_height);
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
-                                          m_renderbufferid);
+                glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_spec.samples, GL_STENCIL_INDEX8, m_width, m_height);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_renderbufferid);
             }
             else
             {
@@ -138,6 +142,10 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24STENCIL8;
                 spec.format         = TextureFormat::DEPTH;
 
+                if(m_stencilAttachment)
+                {
+                    m_stencilAttachment.reset();
+                }
                 m_stencilAttachment = Texture2D::Create(m_width, m_height, spec);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D,
                                        m_stencilAttachment->getRendererID(), 0);
@@ -176,8 +184,9 @@ void OpenGLFramebuffer::resolve(const uint32_t resolveFramebufferID) const
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebufferID);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolveFramebufferID);
-    glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT,
-                      GL_NEAREST);
+    // 解析颜色附件和深度附件时，要注意分开解析,因为深度附件似乎必须只能用GL_NEAREST
+    glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

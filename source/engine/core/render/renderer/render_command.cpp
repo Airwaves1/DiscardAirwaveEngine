@@ -9,7 +9,7 @@ RendererAPI *RenderCommand::s_RendererAPI = new OpenGLRendererAPI();
 void RenderCommand::Init() { s_RendererAPI->init(); }
 
 // 调用此API之前, 绑定了什么Shader, 就用对应的Shader绘制这个vertex array
-void RenderCommand::DrwaIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count)
+void RenderCommand::DrawIndexed(const std::shared_ptr<VertexArray> &va, uint32_t count)
 {
     va->bind();
     if (count == 0)

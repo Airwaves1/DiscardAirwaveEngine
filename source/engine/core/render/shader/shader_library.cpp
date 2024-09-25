@@ -31,7 +31,7 @@ namespace Airwave
             return nullptr;
         }
 
-
+        shader->setName(name);
         add(name, shader);
         return shader;
     }

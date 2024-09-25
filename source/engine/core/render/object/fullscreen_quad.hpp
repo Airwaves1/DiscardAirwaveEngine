@@ -15,12 +15,19 @@ class FullScreenQuad
     FullScreenQuad();
     ~FullScreenQuad() = default;
 
-    void render( const std::shared_ptr<Framebuffer> &framebuffer);
+    void resolve(const std::shared_ptr<Framebuffer> &framebuffer);
+    void render(const std::shared_ptr<Texture2D> &texture,const std::shared_ptr<Shader> &shader);
+    void renderToDefaultFramebuffer();
+
+    std::shared_ptr<Framebuffer> getFramebuffer() { return m_resolveFramebuffer; }
 
   private:
     std::shared_ptr<VertexArray> m_vertexArray;
-    std::shared_ptr<Shader> m_shader;
     std::shared_ptr<Framebuffer> m_resolveFramebuffer;
-    
-    };
+
+  public:
+    std::shared_ptr<Shader> m_shader;
+    std::string vertexShader;
+    std::string fragmentShader;
+};
 } // namespace Airwave

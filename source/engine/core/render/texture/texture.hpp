@@ -29,15 +29,14 @@ enum class TextureFormat
 
 enum class TextureInternalFormat
 {
-    RGB8     = 0,
-    RGBA8    = 1,
-    RGB16F   = 2,
-    RGBA16F  = 3,
-    DEPTH24  = 4,
-    DEPTH32F = 5,
+    RGB8            = 0,
+    RGBA8           = 1,
+    RGB16F          = 2,
+    RGBA16F         = 3,
+    DEPTH24         = 4,
+    DEPTH32F        = 5,
     DEPTH24STENCIL8 = 6
 };
-
 
 struct TextureSpecification
 {
@@ -66,15 +65,21 @@ class Texture
     Texture(const Texture &)            = delete;
     Texture &operator=(const Texture &) = delete;
 
-    virtual std::shared_ptr<Texture> clone() = 0;
+    virtual std::shared_ptr<Texture> clone() { return nullptr; }
     virtual uint32_t getWidth() const { return m_width; }
     virtual uint32_t getHeight() const { return m_height; }
+
+    virtual void resize(uint32_t width, uint32_t height)
+    {
+        m_width  = width;
+        m_height = height;
+    }
 
     virtual void bind(uint32_t slot = 0) const = 0;
     virtual void unbind() const                = 0;
 
-    virtual void setData(void *data, uint32_t size) = 0;
-    virtual uint32_t getRendererID() const          = 0;
+    virtual void setData(void *data, uint32_t size) {}
+    virtual uint32_t getRendererID() const = 0;
 
     virtual const std::string &getPath() const { return m_path; }
 
