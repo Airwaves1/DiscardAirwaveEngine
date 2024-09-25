@@ -39,10 +39,34 @@ class Sandbox : public Airwave::Application
         pointLight->diffuse   = glm::vec3(1.0f, 1.0f, 1.0f);
         pointLight->specular  = glm::vec3(1.0f, 1.0f, 1.0f);
 
+        // 平行光
+        auto lightEntity_1    = m_scene->createAwEntity("light_1");
+        auto directionalLight = lightEntity_1->addComponent<Airwave::LightComponent>();
+        directionalLight->type      = Airwave::LightType::Directional;
+        directionalLight->intensity = 1.0f;
+        directionalLight->direction = glm::vec3(5.0f, 10.0f, -10.0f);
+        directionalLight->ambient   = glm::vec3(0.2f, 0.2f, 0.2f);
+        directionalLight->diffuse   = glm::vec3(1.0f, 1.0f, 1.0f);
+        directionalLight->specular  = glm::vec3(1.0f, 1.0f, 1.0f);
+
+
 
         // // 添加渲染系统
         auto forwardRenderSystem = std::make_shared<Airwave::ForwardRenderSystem>();
         m_scene->addSystem(forwardRenderSystem);
+
+        // // 添加背景系统
+        std::array<std::string, 6> skyboxPaths = {
+            TEXTURE_DIR "cube_textures/bridge2/posx.jpg",
+            TEXTURE_DIR "cube_textures/bridge2/negx.jpg",
+            TEXTURE_DIR "cube_textures/bridge2/posy.jpg",
+            TEXTURE_DIR "cube_textures/bridge2/negy.jpg",
+            TEXTURE_DIR "cube_textures/bridge2/posz.jpg",
+            TEXTURE_DIR "cube_textures/bridge2/negz.jpg",
+        };
+        auto cubeTexture = Airwave::CubeTexture::Create(skyboxPaths);
+        auto backgroundSystem = std::make_shared<Airwave::BackgroundSystem>(cubeTexture);
+        m_scene->addSystem(backgroundSystem);
 
         // // 添加相机系统
         auto cameraSystem = std::make_shared<Airwave::CameraSystem>();

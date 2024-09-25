@@ -8,10 +8,8 @@ namespace Airwave
 class CubeTexture : public Texture
 {
   public:
-    static std::shared_ptr<CubeTexture> Create(const std::string &path,
-                                               const TextureSpecification &spec = TextureSpecification());
-    static std::shared_ptr<CubeTexture> Create(uint32_t width, uint32_t height,
-                                               const TextureSpecification &spec = TextureSpecification());
+    static std::shared_ptr<CubeTexture> Create(const std::array<std::string, 6>& faces);
+  
 };
 
 } // namespace Airwave

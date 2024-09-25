@@ -39,7 +39,7 @@
 #include "render/texture/texture.hpp"
 #include "render/texture/texture_2d.hpp"
 #include "render/texture/texture_manager.hpp"
-
+#include "render/texture/cube_texture.hpp"
 
 //----------geometry----------
 #include "render/geometry/geometry.hpp"
@@ -65,6 +65,7 @@
 #include "ecs/system/forward_render_system.hpp"
 #include "ecs/system/light_system.hpp"
 #include "ecs/system/camera_system.hpp"
+#include "ecs/system/background_system.hpp"
 
 //----------Component----------
 #include "ecs/component/material/material_component.hpp"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "render/renderer/renderer_api.hpp"
-
+#include "render/renderer/renderer_state.hpp"
 // 调用RendererAPI的接口，这里是一个Wrapper
 
 namespace Airwave

@@ -7,20 +7,20 @@ namespace Airwave
 class OpenGLCubeTexture : public CubeTexture
 {
   public:
-    OpenGLCubeTexture(const std::string &path, const TextureSpecification &spec);
-    OpenGLCubeTexture(uint32_t width, uint32_t height, const TextureSpecification &spec);
+    OpenGLCubeTexture(const std::array<std::string, 6>& faces);
+    virtual ~OpenGLCubeTexture();
 
     virtual void bind(uint32_t slot = 0) const override;
     virtual void unbind() const override;
 
-    virtual void setData(void *data, uint32_t size) override;
+    virtual void setData(void *data, uint32_t size) override {}
 
     virtual uint32_t getRendererID() const override { return m_rendererID; }
 
   private:
 
     void loadTexutres(const std::array<std::string, 6> &faces);
-    void createEmptyTexture();
+    void createEmptyTexture() {}
 
     uint32_t m_rendererID;
 };

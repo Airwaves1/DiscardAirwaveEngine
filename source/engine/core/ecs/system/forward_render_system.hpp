@@ -16,10 +16,12 @@
 #include "ecs/component/transform/transform_component.hpp"
 #include "ecs/system/light_system.hpp"
 #include "ecs/system/material_system.hpp"
+#include "ecs/system/background_system.hpp"
 #include "ecs/component/object/mesh_component.hpp"
 #include "ecs/system/transform_system.hpp"
 #include "event/event_observer.hpp"
 #include "render/renderer/render_target.hpp"
+#include "render/texture/cube_texture.hpp"
 namespace Airwave
 {
 class ForwardRenderSystem : public System
@@ -46,6 +48,7 @@ class ForwardRenderSystem : public System
         m_materialSystem = std::make_shared<MaterialSystem>();
 
         m_renderTarget = std::make_shared<RenderTarget>(1200, 900, TextureSpecification());
+
     }
     virtual ~ForwardRenderSystem() {}
 
@@ -98,6 +101,8 @@ class ForwardRenderSystem : public System
 
         m_lightSystem->updateLights(scene->getRegistry());
 
+
+
         // 处理网格组件
         auto meshView = scene->getRegistry().view<MeshComponent, TransformComponent>();
         meshView.each(
@@ -126,6 +131,19 @@ class ForwardRenderSystem : public System
                 // 绘制几何体
                 mesh.geometryComponent->draw();
             });
+
+                    // ########################## 5. 设置背景 ##########################
+        if (!scene->hasSystem<BackgroundSystem>())
+        {
+            m_backgroundSystem = std::make_shared<BackgroundSystem>(glm::vec4(0.6f, 0.2f, 0.2f, 1.0f));
+            scene->addSystem(m_backgroundSystem);
+        }
+        else
+        {
+            m_backgroundSystem = scene->getSystem<BackgroundSystem>();
+        }
+
+        m_backgroundSystem->render(cameraComponent.camera);
 
         // ########################## 7. 渲染完成后的处理 ##########################
 
@@ -177,15 +195,19 @@ class ForwardRenderSystem : public System
         }
     )";
     std::shared_ptr<Shader> shader = SHADER_LIB.load("test", vertexSrc, fragmentSrc, false);
+
     std::shared_ptr<Framebuffer> m_framebuffer;
     std::shared_ptr<FullScreenQuad> m_fullScreenQuad;
+
     std::shared_ptr<RenderTarget> m_renderTarget;
 
     std::shared_ptr<LightSystem> m_lightSystem;
     std::shared_ptr<MaterialSystem> m_materialSystem;
     std::shared_ptr<TransformSystem> m_transformSystem;
+    std::shared_ptr<BackgroundSystem> m_backgroundSystem;
 
     std::shared_ptr<EventObserver> m_eventObserver;
+
 };
 
 } // namespace Airwave
