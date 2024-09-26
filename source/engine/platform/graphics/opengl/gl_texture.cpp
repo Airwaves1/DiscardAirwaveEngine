@@ -25,12 +25,12 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, const TextureSpecifica
     if (channels == 3)
     {
         m_specification.format         = TextureFormat::RGB;
-        m_specification.internalFormat = TextureInternalFormat::RGB8;
+        m_specification.internalFormat = TextureInternalFormat::SRGB8;
     }
     else if (channels == 4)
     {
         m_specification.format         = TextureFormat::RGBA;
-        m_specification.internalFormat = TextureInternalFormat::RGBA8;
+        m_specification.internalFormat = TextureInternalFormat::SRGBA8;
     }
     else
     {
@@ -266,6 +266,10 @@ GLenum OpenGLTexture2D::TextureInternalFormatToGL(TextureInternalFormat format)
             return GL_DEPTH_COMPONENT32F;
         case TextureInternalFormat::DEPTH24STENCIL8:
             return GL_DEPTH24_STENCIL8;
+        case TextureInternalFormat::SRGB8:
+            return GL_SRGB8;
+        case TextureInternalFormat::SRGBA8:
+            return GL_SRGB8_ALPHA8;
         default:
             AW_ASSERT(false, "Unknown TextureInternalFormat!");
             return 0;

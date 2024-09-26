@@ -41,8 +41,22 @@ FullScreenQuad::FullScreenQuad()
 
         void main()
         {
-            color = texture(u_texture, v_texCoord);
-            // color = vec4(1.0, 0.0, 0.0, 1.0);
+            // color = texture(u_texture, v_texCoord);
+
+            float gamma = 2.2;
+            vec3 hdrColor = texture(u_texture, v_texCoord).rgb;
+
+            // reinhard tone mapping
+            // vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+
+            // 曝光色调映射
+            float exposure = 1.0;
+            vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
+
+            // gamma correction
+            vec3 gammaCorrected = pow(mapped, vec3(1.0 / gamma));
+
+            color = vec4(gammaCorrected, 1.0);
         }
     )";
 

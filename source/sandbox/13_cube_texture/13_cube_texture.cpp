@@ -36,7 +36,7 @@ class Sandbox : public Airwave::Application
         pointLight->intensity = 1.0f;
         pointLight->position  = glm::vec3(0.0f, 2.0f, 3.0f);
         pointLight->ambient   = glm::vec3(0.2f, 0.2f, 0.2f);
-        pointLight->diffuse   = glm::vec3(1.0f, 1.0f, 1.0f);
+        pointLight->diffuse   = glm::vec3(100.0f, 100.0f, 100.0f);
         pointLight->specular  = glm::vec3(1.0f, 1.0f, 1.0f);
 
         // 平行光
@@ -46,7 +46,7 @@ class Sandbox : public Airwave::Application
         directionalLight->intensity = 1.0f;
         directionalLight->direction = glm::vec3(5.0f, 10.0f, -10.0f);
         directionalLight->ambient   = glm::vec3(0.2f, 0.2f, 0.2f);
-        directionalLight->diffuse   = glm::vec3(1.0f, 1.0f, 1.0f);
+        directionalLight->diffuse   = glm::vec3(100.0f, 100.0f, 100.0f);
         directionalLight->specular  = glm::vec3(1.0f, 1.0f, 1.0f);
 
 

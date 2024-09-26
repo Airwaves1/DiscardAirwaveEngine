@@ -69,8 +69,13 @@ void main() {
         }
     }
 
+    // gamma correction
+    // float gamma = 2.2;
+    // finalColor.rgb = pow(finalColor.rgb, vec3(1.0 / gamma));
+
     // 输出最终颜色，alpha 值为基础颜色的 alpha
     o_fragColor = finalColor;
+
 }
 
 vec3 CalPointLight(vec3 normal, vec3 worldPosition, vec3 cameraPosition, Light light) {

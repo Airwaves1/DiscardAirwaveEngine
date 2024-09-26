@@ -48,9 +48,10 @@ void OpenGLFramebuffer::invalidate()
     for (uint32_t i = 0; i < m_spec.colorAttachmentCount; i++)
     {
         TextureSpecification spec;
-        spec.enableMSAA      = m_spec.enableMSAA;
-        spec.samples         = m_spec.enableMSAA ? m_spec.samples : 1;
-        spec.internalFormat  = TextureInternalFormat::RGBA8;
+        spec.enableMSAA     = m_spec.enableMSAA;
+        spec.samples        = m_spec.enableMSAA ? m_spec.samples : 1;
+        // spec.internalFormat = TextureInternalFormat::RGBA8;
+        spec.internalFormat = TextureInternalFormat::RGBA16F;
         spec.format          = TextureFormat::RGBA;
         auto colorAttachment = Texture2D::Create(m_width, m_height, spec);
         if (m_spec.enableMSAA)
@@ -89,7 +90,7 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24STENCIL8;
                 spec.format         = TextureFormat::DEPTH;
 
-                if(m_depthAttachment)
+                if (m_depthAttachment)
                 {
                     m_depthAttachment.reset();
                 }
@@ -116,7 +117,7 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24;
                 spec.format         = TextureFormat::DEPTH;
 
-                if(m_depthAttachment)
+                if (m_depthAttachment)
                 {
                     m_depthAttachment.reset();
                 }
@@ -142,7 +143,7 @@ void OpenGLFramebuffer::invalidate()
                 spec.internalFormat = TextureInternalFormat::DEPTH24STENCIL8;
                 spec.format         = TextureFormat::DEPTH;
 
-                if(m_stencilAttachment)
+                if (m_stencilAttachment)
                 {
                     m_stencilAttachment.reset();
                 }
